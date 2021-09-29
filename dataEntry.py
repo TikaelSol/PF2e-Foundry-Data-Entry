@@ -8,10 +8,15 @@ def convert_to_lower(match_obj):
 def reformat(text):
     ## Initial handling not using regex.
     string = "<p>" + text.replace("’","'").replace("Trigger","<p><strong>Trigger</strong>").replace("Requirements","<p><strong>Requirements</strong>").replace("\nCritical Success","</p><hr /><p><strong>Critical Success</strong>").replace("\nSuccess","</p><p><strong>Success</strong>").replace("\nFailure","</p><p><strong>Failure</strong>").replace("\nCritical Failure","</p><p><strong>Critical Failure</strong>").replace("\nSpecial","</p><p><strong>Special</strong>").replace("\n"," ").replace("Frequency","<p><strong>Frequency</strong>").replace("Effect","</p><p><strong>Effect</strong>").replace("—","-") + "</p>"
-    string = string.replace("<p><p>","<p>").replace("–","-").replace("Activate","</p><p><strong>Activate</strong>").replace(r"”",r"\"").replace(r"“",r"\"")
+    string = string.replace("<p><p>","<p>").replace("–","-").replace(r"”",r"\"").replace(r"“",r"\"")
+    # string = string.replace("Activate","</p><p><strong>Activate</strong>")
     
     string = string.replace("Maximum Duration","</p><p><strong>Maximum Duration</strong>").replace("Onset","</p><p><strong>Onset</strong>").replace("Saving Throw","</p><p><strong>Saving Throw</strong>")
     string = re.sub(r"Stage (\d)",r"</p><p><strong>Stage \1</strong>",string)
+    
+    string = string.replace(" </p>","</p>")
+    
+    string = re.sub(r"Activate \?",r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>",string)
     
     ## Skills and saves
     string = re.sub(r"DC (\d+) basic (\w+) save", r"<span data-pf2-check='\2' data-pf2-traits='damaging-effect' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>basic \2</span> save",string)
@@ -34,10 +39,10 @@ def reformat(text):
     
     # Damage rolls
     string = re.sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/r \1d\2 #\3]]{\1d\2 \3}", string)
-    string = re.sub(r" (\d+) (\w*) damage", r" [[/r \1 #\2 damage]]{\1 \2}", string)
-    string = re.sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r \1d\2 + \3 #\4]]{\1d\2 + \3 \4 damage}", string)
-    string = re.sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r \1d\2 #persistent \3]]{\1d\2} @Compendium[pf2e.conditionitems.Persistent Damage]{Persistent \3 Damage}", string)
-    string = re.sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r \1d\2 #\3]]{\1d\2 \3 damage}", string)
+    string = re.sub(r" (\d+) (\w*) damage", r" [[/r {\1}[\2] damage]]{\1 \2}", string)
+    string = re.sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r {\1d\2 + \3}[\4]]]{\1d\2 + \3 \4 damage}", string)
+    string = re.sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r {\1d\2}[persistent,\3]]]{\1d\2} @Compendium[pf2e.conditionitems.Persistent Damage]{Persistent \3 Damage}", string)
+    string = re.sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r {\1d\2}[\3]]]{\1d\2 \3 damage}", string)
     string = re.sub(r"(\d+)d(\d+) (\w+)(\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
     string = re.sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]]{\1d\2}.", string)
     
@@ -48,16 +53,20 @@ def reformat(text):
     string = re.sub(r"<hr /></p><p><strong>Heightened",r"</p><hr /><p><strong>Heightened",string)
         
     ## Removing bullet points, should replace with the actual bullet points.
+    # string = re.sub(r"»",r"•",string)
     string = re.sub(r"•","<ul><li>",string, count = 1)
     string = re.sub(r"•","</li><li>",string)
     
-    # ## Add template buttons
-    # string = re.sub(r"(\d+)-foot (emanation|burst)",r"<span data-pf2-effect-area='\2\' data-pf2-distance='\1'>\1-foot \2</span>",string)
-    # string = re.sub(r"(\d+)-foot cone",r"<span data-pf2-effect-area='cone' data-pf2-distance='\1'>\1-foot Cone</span>",string)
-    # string = re.sub(r"(\d+)-foot line",r"<span data-pf2-effect-area='line' data-pf2-distance='\1'>\1-foot Line</span>",string)
+    string = re.sub(r"Conflux Spell",r"</p><p><strong>Conflux Spell</strong>",string)
+    
+    ## Add template buttons
+    string = re.sub(r"(\d+)-foot (emanation|burst)",r"<span data-pf2-effect-area='\2' data-pf2-distance='\1'>\1-foot \2</span>",string)
+    string = re.sub(r"(\d+)-foot cone",r"<span data-pf2-effect-area='cone' data-pf2-distance='\1'>\1-foot Cone</span>",string)
+    string = re.sub(r"(\d+)-foot line",r"<span data-pf2-effect-area='line' data-pf2-distance='\1'>\1-foot Line</span>",string)
     
     ## Condition handling
     string = re.sub(r"blinded", r"@Compendium[pf2e.conditionitems.Blinded]{Blinded}",string, count = 1)
+    string = re.sub(r"fatigued", r"@Compendium[pf2e.conditionitems.Fatigued]{Fatigued}",string, count = 1)
     string = re.sub(r"confused", r"@Compendium[pf2e.conditionitems.Confused]{Confused}",string, count = 1)
     string = re.sub(r"concealed", r"@Compendium[pf2e.conditionitems.Concealed]{Concealed}",string, count = 1)
     string = re.sub(r"dazzled", r"@Compendium[pf2e.conditionitems.Dazzled]{Dazzled}",string, count = 1)
@@ -70,6 +79,11 @@ def reformat(text):
     string = re.sub(r"unconscious", r"@Compendium[pf2e.conditionitems.Unconscious]{Unconscious}",string, count = 1)
     string = re.sub(r"fascinated", r"@Compendium[pf2e.conditionitems.Fascinated]{Fascinated}",string, count = 1)
     string = re.sub(r"paralyzed", r"@Compendium[pf2e.conditionitems.Paralyzed]{Paralyzed}",string, count = 1)
+    string = re.sub(r"hidden", r"@Compendium[pf2e.conditionitems.Hidden]{Hidden}",string, count = 1)
+    string = re.sub(r"quickened", r"@Compendium[pf2e.conditionitems.Quickened]{Quickened}",string, count = 1)
+    string = re.sub(r"fleeing", r"@Compendium[pf2e.conditionitems.Fleeing]{Fleeing}",string, count = 1)
+    string = re.sub(r"restrained", r"@Compendium[pf2e.conditionitems.Restrained]{Restrained}",string, count = 1)
+    string = re.sub(r"grabbed", r"@Compendium[pf2e.conditionitems.Grabbed]{Grabbed}",string, count = 1)
     
     string = re.sub(r"clumsy 1", r"@Compendium[pf2e.conditionitems.Clumsy]{Clumsy 1}",string, count = 1)
     string = re.sub(r"doomed 1", r"@Compendium[pf2e.conditionitems.Doomed]{Doomed 1}",string, count = 1)
