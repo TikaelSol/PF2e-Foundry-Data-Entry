@@ -7,7 +7,7 @@ def convert_to_lower(match_obj):
 
 def reformat(text):
     ## Initial handling not using regex.
-    string = "<p>" + text.replace("’","'").replace("Trigger","<p><strong>Trigger</strong>").replace("Requirements","<p><strong>Requirements</strong>").replace("\nCritical Success","</p><hr /><p><strong>Critical Success</strong>").replace("\nSuccess","</p><p><strong>Success</strong>").replace("\nFailure","</p><p><strong>Failure</strong>").replace("\nCritical Failure","</p><p><strong>Critical Failure</strong>").replace("\nSpecial","</p><p><strong>Special</strong>").replace("\n"," ").replace("Frequency","<p><strong>Frequency</strong>").replace("Effect","</p><p><strong>Effect</strong>").replace("—","-") + "</p>"
+    string = "<p>" + text.replace("’","'").replace("Trigger","<p><strong>Trigger</strong>").replace("Requirements","<p><strong>Requirements</strong>").replace("\nCritical Success","</p><hr /><p><strong>Critical Success</strong>").replace("\nSuccess","</p><p><strong>Success</strong>").replace("\nFailure","</p><p><strong>Failure</strong>").replace("\nCritical Failure","</p><p><strong>Critical Failure</strong>").replace("\nSpecial","</p><p><strong>Special</strong>").replace("\n"," ").replace("Frequency","<p><strong>Frequency</strong>").replace("Effect","</p><p><strong>Effect</strong>").replace("—","-").replace("Cost","<strong>Cost</strong>") + "</p>"
     string = string.replace("<p><p>","<p>").replace("–","-").replace(r"”",r"\"").replace(r"“",r"\"")
     # string = string.replace("Activate","</p><p><strong>Activate</strong>")
     
@@ -57,12 +57,9 @@ def reformat(text):
     string = re.sub(r"•","<ul><li>",string, count = 1)
     string = re.sub(r"•","</li><li>",string)
     
-    string = re.sub(r"Conflux Spell",r"</p><p><strong>Conflux Spell</strong>",string)
-    
     ## Add template buttons
-    string = re.sub(r"(\d+)-foot (emanation|burst)",r"<span data-pf2-effect-area='\2' data-pf2-distance='\1'>\1-foot \2</span>",string)
-    string = re.sub(r"(\d+)-foot cone",r"<span data-pf2-effect-area='cone' data-pf2-distance='\1'>\1-foot Cone</span>",string)
-    string = re.sub(r"(\d+)-foot line",r"<span data-pf2-effect-area='line' data-pf2-distance='\1'>\1-foot Line</span>",string)
+    string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)",r"@Template[type:\2|distance:\1]",string)
+    # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)",r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>",string)
     
     ## Condition handling
     string = re.sub(r"blinded", r"@Compendium[pf2e.conditionitems.Blinded]{Blinded}",string, count = 1)
@@ -127,7 +124,7 @@ def reformat(text):
     string = re.sub(r"stunned 4", r"@Compendium[pf2e.conditionitems.Stunned]{Stunned 4}",string, count = 1)    
     string = re.sub(r"stupefied 4", r"@Compendium[pf2e.conditionitems.Stupefied]{Stupefied 4}",string, count = 1)
 
-    # Comment out when not entering backgrounds.
+    # ##Comment out when not entering backgrounds.
     # string = re.sub(r"Choose two ability boosts.",r"</p><p>Choose two ability boosts.",string)
     # string = re.sub(r"(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)",r"<strong>\1</strong>",string, count = 2)
     # string = re.sub(r"You're trained in",r"</p><p>You're trained in",string)
