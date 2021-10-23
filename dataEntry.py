@@ -65,7 +65,7 @@ def handle_conditions(string):
 
 def reformat(text):
     # Initial handling not using regex.
-    string = "<p>" + text.replace("’","'")\
+    string = "<p>" + text.replace("’", "'")\
         .replace("Trigger", "<p><strong>Trigger</strong>")\
         .replace("Requirements", "<p><strong>Requirements</strong>")\
         .replace("\nCritical Success", "</p><hr /><p><strong>Critical Success</strong>")\
