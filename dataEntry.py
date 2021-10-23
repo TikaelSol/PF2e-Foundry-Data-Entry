@@ -1,138 +1,152 @@
 import regex as re
 import pyperclip as cl
 
+DC = r"DC (\d+)"
+
+ABILITY_SCORES = r"(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)"
+SAVES = r"(Reflex|Will|Fortitude)"
+SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
+         r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
+
+CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
+
+
 def convert_to_lower(match_obj):
     if match_obj.group() is not None:
         return match_obj.group().lower()
 
+
+def condition_sub(string, condition):
+    return re.sub(condition.lower(), r"%s%s]{%s}" % (CONDITION_COMPENDIUM, condition, condition), string, count=1)
+
+
+def condition_sub_with_stage(string, condition, stage):
+    return re.sub(r"%s %s" % (condition.lower(), stage),
+                  r"%s%s]{%s %s}" % (CONDITION_COMPENDIUM, condition, condition, stage),
+                  string, count=1)
+
+
+def handle_conditions(string):
+    # Condition handling
+    string = condition_sub(string, r"Blinded")
+    string = condition_sub(string, r"Fatigued")
+    string = condition_sub(string, r"Confused")
+    string = condition_sub(string, r"Concealed")
+    string = condition_sub(string, r"Dazzled")
+    string = condition_sub(string, r"Invisible")
+    string = condition_sub(string, r"Flat-Footed")
+    string = condition_sub(string, r"Immobilized")
+    string = condition_sub(string, r"Prone")
+    string = condition_sub(string, r"Unconscious")
+    string = condition_sub(string, r"Fascinated")
+    string = condition_sub(string, r"Paralyzed")
+    string = condition_sub(string, r"Hidden")
+    string = condition_sub(string, r"Quickened")
+    string = condition_sub(string, r"Fleeing")
+    string = condition_sub(string, r"Restrained")
+    string = condition_sub(string, r"Grabbed")
+
+    # Handle this one manually due to the lack of hyphen.
+    string = re.sub(r"flat footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count=1)
+
+    for i in range(1, 4):
+        string = condition_sub_with_stage(string, r"Clumsy", i)
+        string = condition_sub_with_stage(string, r"Doomed", i)
+        string = condition_sub_with_stage(string, r"Drained", i)
+        string = condition_sub_with_stage(string, r"Enfeebled", i)
+        string = condition_sub_with_stage(string, r"Slowed", i)
+        string = condition_sub_with_stage(string, r"Frightened", i)
+        string = condition_sub_with_stage(string, r"Sickened", i)
+        string = condition_sub_with_stage(string, r"Stunned", i)
+        string = condition_sub_with_stage(string, r"Stupefied", i)
+        string = condition_sub_with_stage(string, r"Quickened", i)
+    return string
+
+
 def reformat(text):
-    ## Initial handling not using regex.
-    string = "<p>" + text.replace("’","'").replace("Trigger","<p><strong>Trigger</strong>").replace("Requirements","<p><strong>Requirements</strong>").replace("\nCritical Success","</p><hr /><p><strong>Critical Success</strong>").replace("\nSuccess","</p><p><strong>Success</strong>").replace("\nFailure","</p><p><strong>Failure</strong>").replace("\nCritical Failure","</p><p><strong>Critical Failure</strong>").replace("\nSpecial","</p><p><strong>Special</strong>").replace("\n"," ").replace("Frequency","<p><strong>Frequency</strong>").replace("Effect","</p><p><strong>Effect</strong>").replace("—","-").replace("Cost","<strong>Cost</strong>") + "</p>"
-    string = string.replace("<p><p>","<p>").replace("–","-").replace(r"”",r"\"").replace(r"“",r"\"")
-    # string = string.replace("Activate","</p><p><strong>Activate</strong>")
-    
-    string = string.replace("Maximum Duration","</p><p><strong>Maximum Duration</strong>").replace("Onset","</p><p><strong>Onset</strong>").replace("Saving Throw","</p><p><strong>Saving Throw</strong>")
-    string = re.sub(r"Stage (\d)",r"</p><p><strong>Stage \1</strong>",string)
-    
-    string = string.replace(" </p>","</p>")
-    
-    string = re.sub(r"Activate \?",r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>",string)
-    
-    ## Skills and saves
-    string = re.sub(r"DC (\d+) basic (\w+) save", r"<span data-pf2-check='\2' data-pf2-traits='damaging-effect' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>basic \2</span> save",string)
-    string = re.sub(r"DC (\d+) (Reflex|Will|Fortitude)", r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>",string)
-    string = re.sub(r"(Reflex|Will|Fortitude) DC (\d+)", r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>",string)
-    string = re.sub(r"(Reflex|Will|Fortitude) \(DC (\d+)\)", r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>",string)
-    string = re.sub(r"(Reflex|Will|Fortitude) save \(DC (\d+)\)", r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>",string)
+    # Initial handling not using regex.
+    string = "<p>" + text.replace("’", "'")\
+        .replace("Trigger", "<p><strong>Trigger</strong>")\
+        .replace("Requirements", "<p><strong>Requirements</strong>")\
+        .replace("\nCritical Success", "</p><hr /><p><strong>Critical Success</strong>")\
+        .replace("\nSuccess", "</p><p><strong>Success</strong>")\
+        .replace("\nFailure", "</p><p><strong>Failure</strong>")\
+        .replace("\nCritical Failure", "</p><p><strong>Critical Failure</strong>")\
+        .replace("\nSpecial", "</p><p><strong>Special</strong>")\
+        .replace("\n", " ")\
+        .replace("Frequency", "<p><strong>Frequency</strong>")\
+        .replace("Effect", "</p><p><strong>Effect</strong>")\
+        .replace("—", "-")\
+        .replace("Cost", "<strong>Cost</strong>") + "</p>"
+    string = string.replace("<p><p>", "<p>")\
+        .replace("–", "-")\
+        .replace(r"”", r"\"")\
+        .replace(r"“", r"\"")
+    # string = string.replace("Activate", "</p><p><strong>Activate</strong>")
 
-    string = re.sub(r"DC (\d+) (Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)", r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>",string)
-    string = re.sub(r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|Occultism|Performance|Religion|Society|Stealth|Survival|Thievery) DC (\d+)", r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>",string)
-    string = re.sub(r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|Occultism|Performance|Religion|Society|Stealth|Survival|Thievery) \(DC (\d+)\)", r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>",string)
+    string = string.replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
+        .replace("Onset", "</p><p><strong>Onset</strong>")\
+        .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
+    string = re.sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
-    string = re.sub(r"(\w+) Lore DC (\d+)", r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2 Lore</span>",string)
-    string = re.sub(r"DC (\d+) (\w+) save", r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span> save",string)
-    string = re.sub(r"DC (\d+) flat check", r"<span data-pf2-check='flat' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='owner'>Flat Check</span>",string)
+    string = string.replace(" </p>", "</p>")
 
-    ## Catch capitalized saves
-    string = re.sub("check='(Will|Fortitude|Reflex)'", convert_to_lower, string)
-    string = re.sub(r"check='(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)'", convert_to_lower, string)
-    
+    string = re.sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
+
+    # Skills and saves
+    string = re.sub(r"%s basic (\w+) save" % DC, r"<span data-pf2-check='\2' data-pf2-traits='damaging-effect' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>basic \2</span> save", string)
+    string = re.sub(r"%s %s" % (DC, SAVES), r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>", string)
+    string = re.sub(r"%s %s" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s \(%s\)" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s save \(%s\)" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+
+    string = re.sub(r"%s %s" % (DC, SKILLS), r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>", string)
+    string = re.sub(r"%s %s" % (SKILLS, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s \(%s\)" % (SKILLS, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+
+    string = re.sub(r"(\w+) Lore %s" % DC, r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2 Lore</span>", string)
+    string = re.sub(r"%s (\w+) save" % DC, r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span> save", string)
+    string = re.sub(r"%s flat check" % DC, r"<span data-pf2-check='flat' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='owner'>Flat Check</span>", string)
+
+    # Catch capitalized saves
+    string = re.sub("check='(%s'" % SAVES, convert_to_lower, string)
+    string = re.sub(r"check='%s'" % SKILLS, convert_to_lower, string)
+
     # Damage rolls
     string = re.sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/r \1d\2 #\3]]{\1d\2 \3}", string)
     string = re.sub(r" (\d+) (\w*) damage", r" [[/r {\1}[\2] damage]]{\1 \2}", string)
     string = re.sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r {\1d\2 + \3}[\4]]]{\1d\2 + \3 \4 damage}", string)
-    string = re.sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r {\1d\2}[persistent,\3]]]{\1d\2} @Compendium[pf2e.conditionitems.Persistent Damage]{Persistent \3 Damage}", string)
+    string = re.sub(r"(\d+)d(\d+) persistent (\w*) damage",
+                    r"[[/r {\1d\2}[persistent,\3]]]{\1d\2} %sPersistent Damage]{Persistent \3 Damage}" % CONDITION_COMPENDIUM, string)
     string = re.sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r {\1d\2}[\3]]]{\1d\2 \3 damage}", string)
     string = re.sub(r"(\d+)d(\d+) (\w+)(\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
     string = re.sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]]{\1d\2}.", string)
-    
-    ## Spell heightening handling
-    string = re.sub(r"Heightened \(",r"<hr />Heightened (",string, count = 1)
-    string = re.sub(r"Heightened \(\+(\d+)\)",r"</p><p><strong>Heightened (+\1)</strong>",string)
-    string = re.sub(r"Heightened \((\d+)(\w+)\)",r"</p><p><strong>Heightened (\1\2)</strong>",string)
-    string = re.sub(r"<hr /></p><p><strong>Heightened",r"</p><hr /><p><strong>Heightened",string)
-        
-    ## Removing bullet points, should replace with the actual bullet points.
-    # string = re.sub(r"»",r"•",string)
-    string = re.sub(r"•","<ul><li>",string, count = 1)
-    string = re.sub(r"•","</li><li>",string)
-    
-    ## Add template buttons
-    string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)",r"@Template[type:\2|distance:\1]",string)
-    # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)",r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>",string)
-    
-    ## Condition handling
-    string = re.sub(r"blinded", r"@Compendium[pf2e.conditionitems.Blinded]{Blinded}",string, count = 1)
-    string = re.sub(r"fatigued", r"@Compendium[pf2e.conditionitems.Fatigued]{Fatigued}",string, count = 1)
-    string = re.sub(r"confused", r"@Compendium[pf2e.conditionitems.Confused]{Confused}",string, count = 1)
-    string = re.sub(r"concealed", r"@Compendium[pf2e.conditionitems.Concealed]{Concealed}",string, count = 1)
-    string = re.sub(r"dazzled", r"@Compendium[pf2e.conditionitems.Dazzled]{Dazzled}",string, count = 1)
-    string = re.sub(r"deafened", r"@Compendium[pf2e.conditionitems.Deafened]{Deafened}",string, count = 1)
-    string = re.sub(r"invisible", r"@Compendium[pf2e.conditionitems.Invisible]{Invisible}",string, count = 1)
-    string = re.sub(r"flat footed", r"@Compendium[pf2e.conditionitems.Flat-Footed]{Flat-Footed}",string, count = 1)
-    string = re.sub(r"flat-footed", r"@Compendium[pf2e.conditionitems.Flat-Footed]{Flat-Footed}",string, count = 1)
-    string = re.sub(r"immobilized", r"@Compendium[pf2e.conditionitems.Immobilized]{Immobilized}",string, count = 1)
-    string = re.sub(r"prone", r"@Compendium[pf2e.conditionitems.Prone]{Prone}",string, count = 1)
-    string = re.sub(r"unconscious", r"@Compendium[pf2e.conditionitems.Unconscious]{Unconscious}",string, count = 1)
-    string = re.sub(r"fascinated", r"@Compendium[pf2e.conditionitems.Fascinated]{Fascinated}",string, count = 1)
-    string = re.sub(r"paralyzed", r"@Compendium[pf2e.conditionitems.Paralyzed]{Paralyzed}",string, count = 1)
-    string = re.sub(r"hidden", r"@Compendium[pf2e.conditionitems.Hidden]{Hidden}",string, count = 1)
-    string = re.sub(r"quickened", r"@Compendium[pf2e.conditionitems.Quickened]{Quickened}",string, count = 1)
-    string = re.sub(r"fleeing", r"@Compendium[pf2e.conditionitems.Fleeing]{Fleeing}",string, count = 1)
-    string = re.sub(r"restrained", r"@Compendium[pf2e.conditionitems.Restrained]{Restrained}",string, count = 1)
-    string = re.sub(r"grabbed", r"@Compendium[pf2e.conditionitems.Grabbed]{Grabbed}",string, count = 1)
-    
-    string = re.sub(r"clumsy 1", r"@Compendium[pf2e.conditionitems.Clumsy]{Clumsy 1}",string, count = 1)
-    string = re.sub(r"doomed 1", r"@Compendium[pf2e.conditionitems.Doomed]{Doomed 1}",string, count = 1)
-    string = re.sub(r"drained 1", r"@Compendium[pf2e.conditionitems.Drained]{Drained 1}",string, count = 1)
-    string = re.sub(r"enfeebled 1", r"@Compendium[pf2e.conditionitems.Enfeebled]{Enfeebled 1}",string, count = 1)
-    string = re.sub(r"slowed 1", r"@Compendium[pf2e.conditionitems.Slowed]{Slowed 1}",string, count = 1)
-    string = re.sub(r"frightened 1", r"@Compendium[pf2e.conditionitems.Frightened]{Frightened 1}",string, count = 1)
-    string = re.sub(r"sickened 1", r"@Compendium[pf2e.conditionitems.Sickened]{Sickened 1}",string, count = 1)
-    string = re.sub(r"stunned 1", r"@Compendium[pf2e.conditionitems.Stunned]{Stunned 1}",string, count = 1)    
-    string = re.sub(r"stupefied 1", r"@Compendium[pf2e.conditionitems.Stupefied]{Stupefied 1}",string, count = 1)
-    string = re.sub(r"quickened 1", r"@Compendium[pf2e.conditionitems.Quickened]{Quickened 1}",string, count = 1)
-    
-    string = re.sub(r"clumsy 2", r"@Compendium[pf2e.conditionitems.Clumsy]{Clumsy 2}",string, count = 1)
-    string = re.sub(r"doomed 2", r"@Compendium[pf2e.conditionitems.Doomed]{Doomed 2}",string, count = 1)
-    string = re.sub(r"drained 2", r"@Compendium[pf2e.conditionitems.Drained]{Drained 2}",string, count = 1)
-    string = re.sub(r"enfeebled 2", r"@Compendium[pf2e.conditionitems.Enfeebled]{Enfeebled 2}",string, count = 1)
-    string = re.sub(r"slowed 2", r"@Compendium[pf2e.conditionitems.Slowed]{Slowed 2}",string, count = 1)
-    string = re.sub(r"frightened 2", r"@Compendium[pf2e.conditionitems.Frightened]{Frightened 2}",string, count = 1)
-    string = re.sub(r"sickened 2", r"@Compendium[pf2e.conditionitems.Sickened]{Sickened 2}",string, count = 1)
-    string = re.sub(r"stunned 2", r"@Compendium[pf2e.conditionitems.Stunned]{Stunned 2}",string, count = 1)    
-    string = re.sub(r"stupefied 2", r"@Compendium[pf2e.conditionitems.Stupefied]{Stupefied 2}",string, count = 1)
-    string = re.sub(r"quickened 2", r"@Compendium[pf2e.conditionitems.Quickened]{Quickened 2}",string, count = 1)
-    
-    string = re.sub(r"clumsy 3", r"@Compendium[pf2e.conditionitems.Clumsy]{Clumsy 3}",string, count = 1)
-    string = re.sub(r"doomed 3", r"@Compendium[pf2e.conditionitems.Doomed]{Doomed 3}",string, count = 1)
-    string = re.sub(r"drained 3", r"@Compendium[pf2e.conditionitems.Drained]{Drained 3}",string, count = 1)
-    string = re.sub(r"enfeebled 3", r"@Compendium[pf2e.conditionitems.Enfeebled]{Enfeebled 3}",string, count = 1)
-    string = re.sub(r"slowed 3", r"@Compendium[pf2e.conditionitems.Slowed]{Slowed 3}",string, count = 1)
-    string = re.sub(r"frightened 3", r"@Compendium[pf2e.conditionitems.Frightened]{Frightened 3}",string, count = 1)
-    string = re.sub(r"sickened 3", r"@Compendium[pf2e.conditionitems.Sickened]{Sickened 3}",string, count = 1)
-    string = re.sub(r"stunned 3", r"@Compendium[pf2e.conditionitems.Stunned]{Stunned 3}",string, count = 1)    
-    string = re.sub(r"stupefied 3", r"@Compendium[pf2e.conditionitems.Stupefied]{Stupefied 3}",string, count = 1)
 
-    string = re.sub(r"clumsy 4", r"@Compendium[pf2e.conditionitems.Clumsy]{Clumsy 4}",string, count = 1)
-    string = re.sub(r"doomed 4", r"@Compendium[pf2e.conditionitems.Doomed]{Doomed 4}",string, count = 1)
-    string = re.sub(r"drained 4", r"@Compendium[pf2e.conditionitems.Drained]{Drained 4}",string, count = 1)
-    string = re.sub(r"enfeebled 4", r"@Compendium[pf2e.conditionitems.Enfeebled]{Enfeebled 4}",string, count = 1)
-    string = re.sub(r"slowed 4", r"@Compendium[pf2e.conditionitems.Slowed]{Slowed 4}",string, count = 1)
-    string = re.sub(r"frightened 4", r"@Compendium[pf2e.conditionitems.Frightened]{Frightened 4}",string, count = 1)
-    string = re.sub(r"sickened 4", r"@Compendium[pf2e.conditionitems.Sickened]{Sickened 4}",string, count = 1)
-    string = re.sub(r"stunned 4", r"@Compendium[pf2e.conditionitems.Stunned]{Stunned 4}",string, count = 1)    
-    string = re.sub(r"stupefied 4", r"@Compendium[pf2e.conditionitems.Stupefied]{Stupefied 4}",string, count = 1)
+    # Spell heightening handling
+    string = re.sub(r"Heightened \(", r"<hr />Heightened (", string, count=1)
+    string = re.sub(r"Heightened \(\+(\d+)\)", r"</p><p><strong>Heightened (+\1)</strong>", string)
+    string = re.sub(r"Heightened \((\d+)(\w+)\)", r"</p><p><strong>Heightened (\1\2)</strong>", string)
+    string = re.sub(r"<hr /></p><p><strong>Heightened", r"</p><hr /><p><strong>Heightened", string)
 
-    # ##Comment out when not entering backgrounds.
-    # string = re.sub(r"Choose two ability boosts.",r"</p><p>Choose two ability boosts.",string)
-    # string = re.sub(r"(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)",r"<strong>\1</strong>",string, count = 2)
-    # string = re.sub(r"You're trained in",r"</p><p>You're trained in",string)
+    # Removing bullet points, should replace with the actual bullet points.
+    # string = re.sub(r"»", r"•", string)
+    string = re.sub(r"•", "<ul><li>", string, count=1)
+    string = re.sub(r"•", "</li><li>", string)
+
+    # Add template buttons
+    string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"@Template[type:\2|distance:\1]", string)
+    # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
+
+    string = handle_conditions(string)
+
+    # #Comment out when not entering backgrounds.
+    # string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
+    # string = re.sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
+    # string = re.sub(r"You're trained in", r"</p><p>You're trained in", string)
 
     print("\n")
     print(string)
     cl.copy(string)
 
+
 reformat(input())
-
-
