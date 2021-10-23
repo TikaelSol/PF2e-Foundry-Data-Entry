@@ -9,6 +9,10 @@ def convert_to_lower(match_obj):
         return match_obj.group().lower()
 
 
+def action_sub(string, action):
+    return re.sub(action, r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+
+
 def condition_sub(string, condition):
     return re.sub(condition.lower(), r"%s%s]{%s}" % (CONDITION_COMPENDIUM, condition, condition), string, count=1)
 
@@ -19,8 +23,22 @@ def condition_sub_with_stage(string, condition, stage):
                   string, count=1)
 
 
-def action_sub(string, action):
-    return re.sub(action, r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+def equipment_sub(string, action):
+    return re.sub(action, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (action, action), string, count=1)
+
+
+def feat_sub(string, action):
+    return re.sub(action, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (action, action), string, count=1)
+
+
+def spell_sub(string, action):
+    return re.sub(action, r"@Compendium[pf2e.spells-srd.%s]{%s}" % (action, action), string, count=1)
+
+
+def handle_actions(string):
+    for action in ACTIONS:
+        string = action_sub(string, action)
+    return string
 
 
 def handle_conditions(string):
@@ -36,9 +54,21 @@ def handle_conditions(string):
     return string
 
 
-def handle_actions(string):
-    for action in ACTIONS:
-        string = action_sub(string, action)
+def handle_equipment(string):
+    for equipment in EQUIPMENT:
+        string = equipment_sub(string, equipment)
+    return string
+
+
+def handle_feats(string):
+    for feat in FEATS:
+        string = feat_sub(string, feat)
+    return string
+
+
+def handle_spells(string):
+    for spell in SPELLS:
+        string = spell_sub(string, spell)
     return string
 
 
@@ -116,8 +146,11 @@ def reformat(text):
     string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"@Template[type:\2|distance:\1]", string)
     # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
 
-    string = handle_conditions(string)
     string = handle_actions(string)
+    string = handle_conditions(string)
+    string = handle_equipment(string)
+    string = handle_feats(string)
+    string = handle_spells(string)
 
     # #Comment out when not entering backgrounds.
     # string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)

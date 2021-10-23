@@ -19,3 +19,9 @@ ACTIONS = ["Avoid Notice", "Balance", "Burrow", "Cast a Spell", "Climb", "Coerce
            "Make an Impression", "Mount", "Perform", "Search", "Seek", "Sense Motive", "Shove", "Sneak",
            "Steal", "Sustain a Spell", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds",
            "Trip", "Tumble Through"]
+
+SPELLS = ["Dimension Door", "Plane Shift", "Stone Tell"]
+
+EQUIPMENT = ["Handwraps of Mighty Blows"]
+
+FEATS = ["Canny Acumen", "Quick Jump"]
