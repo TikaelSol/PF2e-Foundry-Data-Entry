@@ -16,6 +16,53 @@ def convert_to_lower(match_obj):
         return match_obj.group().lower()
 
 
+def condition_sub(string, condition):
+    return re.sub(condition.lower(), r"%s%s]{%s}" % (CONDITION_COMPENDIUM, condition, condition), string, count=1)
+
+
+def condition_sub_with_stage(string, condition, stage):
+    return re.sub(r"%s %s" % (condition.lower(), stage),
+                  r"%s%s]{%s %s}" % (CONDITION_COMPENDIUM, condition, condition, stage),
+                  string, count=1)
+
+
+def handle_conditions(string):
+    # Condition handling
+    string = condition_sub(string, r"Blinded")
+    string = condition_sub(string, r"Fatigued")
+    string = condition_sub(string, r"Confused")
+    string = condition_sub(string, r"Concealed")
+    string = condition_sub(string, r"Dazzled")
+    string = condition_sub(string, r"Invisible")
+    string = condition_sub(string, r"Flat-Footed")
+    string = condition_sub(string, r"Immobilized")
+    string = condition_sub(string, r"Prone")
+    string = condition_sub(string, r"Unconscious")
+    string = condition_sub(string, r"Fascinated")
+    string = condition_sub(string, r"Paralyzed")
+    string = condition_sub(string, r"Hidden")
+    string = condition_sub(string, r"Quickened")
+    string = condition_sub(string, r"Fleeing")
+    string = condition_sub(string, r"Restrained")
+    string = condition_sub(string, r"Grabbed")
+
+    # Handle this one manually due to the lack of hyphen.
+    string = re.sub(r"flat footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count=1)
+
+    for i in range(1, 4):
+        string = condition_sub_with_stage(string, r"Clumsy", i)
+        string = condition_sub_with_stage(string, r"Doomed", i)
+        string = condition_sub_with_stage(string, r"Drained", i)
+        string = condition_sub_with_stage(string, r"Enfeebled", i)
+        string = condition_sub_with_stage(string, r"Slowed", i)
+        string = condition_sub_with_stage(string, r"Frightened", i)
+        string = condition_sub_with_stage(string, r"Sickened", i)
+        string = condition_sub_with_stage(string, r"Stunned", i)
+        string = condition_sub_with_stage(string, r"Stupefied", i)
+        string = condition_sub_with_stage(string, r"Quickened", i)
+    return string
+
+
 def reformat(text):
     # Initial handling not using regex.
     string = "<p>" + text.replace("’","'")\
@@ -90,38 +137,7 @@ def reformat(text):
     string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"@Template[type:\2|distance:\1]", string)
     # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
 
-    # Condition handling
-    string = re.sub(r"blinded", r"%sBlinded]{Blinded}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"fatigued", r"%sFatigued]{Fatigued}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"confused", r"%sConfused]{Confused}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"concealed", r"%sConcealed]{Concealed}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"dazzled", r"%sDazzled]{Dazzled}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"deafened", r"%sDeafened]{Deafened}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"invisible", r"%sInvisible]{Invisible}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"flat footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"flat-footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"immobilized", r"%sImmobilized]{Immobilized}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"prone", r"%sProne]{Prone}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"unconscious", r"%sUnconscious]{Unconscious}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"fascinated", r"%sFascinated]{Fascinated}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"paralyzed", r"%sParalyzed]{Paralyzed}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"hidden", r"%sHidden]{Hidden}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"quickened", r"%sQuickened]{Quickened}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"fleeing", r"%sFleeing]{Fleeing}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"restrained", r"%sRestrained]{Restrained}" % CONDITION_COMPENDIUM, string, count=1)
-    string = re.sub(r"grabbed", r"%sGrabbed]{Grabbed}" % CONDITION_COMPENDIUM, string, count=1)
-    
-    for i in range(1, 4):
-        string = re.sub(r"clumsy %s" % i, r"%sClumsy]{Clumsy %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"doomed %s" % i, r"%sDoomed]{Doomed %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"drained %s" % i, r"%sDrained]{Drained %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"enfeebled %s" % i, r"%sEnfeebled]{Enfeebled %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"slowed %s" % i, r"%sSlowed]{Slowed %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"frightened %s" % i, r"%sFrightened]{Frightened %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"sickened %s" % i, r"%sSickened]{Sickened %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"stunned %s" % i, r"%sStunned]{Stunned %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"stupefied %s" % i, r"%sStupefied]{Stupefied %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
-        string = re.sub(r"quickened %s" % i, r"%sQuickened]{Quickened %s}" % (CONDITION_COMPENDIUM, i), string, count=1)
+    string = handle_conditions(string)
 
     # #Comment out when not entering backgrounds.
     # string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
