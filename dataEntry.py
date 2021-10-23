@@ -1,20 +1,7 @@
 import regex as re
 import pyperclip as cl
 
-DC = r"DC (\d+)"
-
-ABILITY_SCORES = r"(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)"
-SAVES = r"(Reflex|Will|Fortitude)"
-SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
-         r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
-
-CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
-
-CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Invisible",
-              "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed",
-              "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed"]
-NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened",
-                       "Stunned", "Stupefied", "Quickened"]
+from constants import *
 
 
 def convert_to_lower(match_obj):
@@ -32,8 +19,11 @@ def condition_sub_with_stage(string, condition, stage):
                   string, count=1)
 
 
+def action_sub(string, action):
+    return re.sub(action, r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+
+
 def handle_conditions(string):
-    # Condition handling
     for condition in CONDITIONS:
         string = condition_sub(string, condition)
 
@@ -43,6 +33,12 @@ def handle_conditions(string):
     for condition in NUMBERED_CONDITIONS:
         for i in range(1, 4):
             string = condition_sub_with_stage(string, condition, i)
+    return string
+
+
+def handle_actions(string):
+    for action in ACTIONS:
+        string = action_sub(string, action)
     return string
 
 
@@ -121,6 +117,7 @@ def reformat(text):
     # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
 
     string = handle_conditions(string)
+    string = handle_actions(string)
 
     # #Comment out when not entering backgrounds.
     # string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
