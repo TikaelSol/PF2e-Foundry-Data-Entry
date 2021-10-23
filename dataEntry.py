@@ -109,7 +109,7 @@ def reformat(text):
     string = re.sub(r"%s flat check" % DC, r"<span data-pf2-check='flat' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='owner'>Flat Check</span>", string)
 
     # Catch capitalized saves
-    string = re.sub("check='(%s'" % SAVES, convert_to_lower, string)
+    string = re.sub(r"check='%s'" % SAVES, convert_to_lower, string)
     string = re.sub(r"check='%s'" % SKILLS, convert_to_lower, string)
 
     # Damage rolls
