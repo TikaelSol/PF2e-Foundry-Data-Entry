@@ -1,0 +1,28 @@
+name: Run Python Tests
+on:
+  push:
+    branches: '*'
+  pull_request:
+    branches: '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - uses: BSFishy/pip-action@v1
+        with:
+          requirements: requirements.txt
+      - name: List python packages
+        run: |
+          python -m pip list
+      - name: Python unit tests
+        run: |
+          python -m unittest
