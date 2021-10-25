@@ -1,4 +1,6 @@
 # PF2e-Foundry-Data-Entry
+[![Actions Status](https://github.com/TikaelSol/PF2e-Foundry-Data-Entry/workflows/Tests/badge.svg)](https://github.com/TikaelSol/PF2e-Foundry-Data-Entry/actions)
+
 A script to aid with data entry for the PF2e system for Foundry VTT
 
 To run it you must either use the binder link [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TikaelSol/PF2e-Foundry-Data-Entry/HEAD) or download the repository and run it using Jupyter.  Alternatively the python code from the ipynb file can be run in any python environment.  Installing pyperclip and uncommenting those lines allows the script to auto place the output on your clipboard, this won't work on the Binder environment unfortunately.
