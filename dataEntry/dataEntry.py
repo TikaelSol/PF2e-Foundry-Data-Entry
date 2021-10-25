@@ -1,7 +1,7 @@
 import regex as re
 import pyperclip as cl
 
-from constants import *
+from dataEntry.constants import *
 
 
 def convert_to_lower(match_obj):
@@ -162,4 +162,9 @@ def reformat(text):
     cl.copy(string)
 
 
-reformat(input())
+def main():
+    reformat(input())
+
+
+if __name__ == "__main__":
+    main()

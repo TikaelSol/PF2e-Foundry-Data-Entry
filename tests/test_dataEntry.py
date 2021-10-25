@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-import dataEntry
+from dataEntry import dataEntry
 
 
 class Test(TestCase):
