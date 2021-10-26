@@ -10,7 +10,7 @@ class Test(TestCase):
         test_string = r"you Seek for creatures; and when you Seek for"
 
         result = dataEntry.action_sub(test_string, test_action)
-        self.assertEquals(r"you @Compendium[pf2e.actionspf2e.Seek]{Seek} for creatures; and when you Seek for", result)
+        self.assertEqual(r"you @Compendium[pf2e.actionspf2e.Seek]{Seek} for creatures; and when you Seek for", result)
 
     def test_condition_sub(self):
         test_condition = r"Blinded"
