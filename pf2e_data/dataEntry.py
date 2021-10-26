@@ -23,16 +23,16 @@ def condition_sub_with_stage(string, condition, stage):
                   string, count=1)
 
 
-def equipment_sub(string, action):
-    return re.sub(action, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (action, action), string, count=1)
+def equipment_sub(string, equipment):
+    return re.sub(equipment, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
 
 
-def feat_sub(string, action):
-    return re.sub(action, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (action, action), string, count=1)
+def feat_sub(string, feat):
+    return re.sub(feat, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
 
 
-def spell_sub(string, action):
-    return re.sub(action, r"@Compendium[pf2e.spells-srd.%s]{%s}" % (action, action), string, count=1)
+def spell_sub(string, spell):
+    return re.sub(spell, r"@Compendium[pf2e.spells-srd.%s]{%s}" % (spell, spell), string, count=1)
 
 
 def handle_actions(string):
