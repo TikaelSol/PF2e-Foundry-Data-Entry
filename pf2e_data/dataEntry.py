@@ -32,7 +32,7 @@ def feat_sub(string, feat):
 
 
 def spell_sub(string, spell):
-    return re.sub(spell, r"@Compendium[pf2e.spells-srd.%s]{%s}" % (spell, spell), string, count=1)
+    return re.sub(spell, r"<em>@Compendium[pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
 
 
 def handle_actions(string):
