@@ -1,7 +1,7 @@
 import regex as re
 import pyperclip as cl
 
-from pf2e_data.constants import *
+from data.constants import *
 
 
 def convert_to_lower(match_obj):
@@ -103,19 +103,19 @@ def reformat(text):
     string = re.sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
 
     # Skills and saves
-    string = re.sub(r"%s basic (\w+) save" % DC, r"<span pf2e_data-pf2-check='\2' pf2e_data-pf2-traits='damaging-effect' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\1' pf2e_data-pf2-show-dc='gm'>basic \2</span> save", string)
-    string = re.sub(r"%s %s" % (DC, SAVES), r"<span pf2e_data-pf2-check='\2' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\1' pf2e_data-pf2-show-dc='gm'>\2</span>", string)
-    string = re.sub(r"%s %s" % (SAVES, DC), r"<span pf2e_data-pf2-check='\1' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\2' pf2e_data-pf2-show-dc='gm'>\1</span>", string)
-    string = re.sub(r"%s \(%s\)" % (SAVES, DC), r"<span pf2e_data-pf2-check='\1' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\2' pf2e_data-pf2-show-dc='gm'>\1</span>", string)
-    string = re.sub(r"%s save \(%s\)" % (SAVES, DC), r"<span pf2e_data-pf2-check='\1' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\2' pf2e_data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s basic (\w+) save" % DC, r"<span data-pf2-check='\2' data-pf2-traits='damaging-effect' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>basic \2</span> save", string)
+    string = re.sub(r"%s %s" % (DC, SAVES), r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>", string)
+    string = re.sub(r"%s %s" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s \(%s\)" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s save \(%s\)" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
 
-    string = re.sub(r"%s %s" % (DC, SKILLS), r"<span pf2e_data-pf2-check='\2' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\1' pf2e_data-pf2-show-dc='gm'>\2</span>", string)
-    string = re.sub(r"%s %s" % (SKILLS, DC), r"<span pf2e_data-pf2-check='\1' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\2' pf2e_data-pf2-show-dc='gm'>\1</span>", string)
-    string = re.sub(r"%s \(%s\)" % (SKILLS, DC), r"<span pf2e_data-pf2-check='\1' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\2' pf2e_data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s %s" % (DC, SKILLS), r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>", string)
+    string = re.sub(r"%s %s" % (SKILLS, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
+    string = re.sub(r"%s \(%s\)" % (SKILLS, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
 
-    string = re.sub(r"(\w+) Lore %s" % DC, r"<span pf2e_data-pf2-check='\2' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\1' pf2e_data-pf2-show-dc='gm'>\2 Lore</span>", string)
-    string = re.sub(r"%s (\w+) save" % DC, r"<span pf2e_data-pf2-check='\2' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\1' pf2e_data-pf2-show-dc='gm'>\2</span> save", string)
-    string = re.sub(r"%s flat check" % DC, r"<span pf2e_data-pf2-check='flat' pf2e_data-pf2-traits='' pf2e_data-pf2-label='' pf2e_data-pf2-dc='\1' pf2e_data-pf2-show-dc='owner'>Flat Check</span>", string)
+    string = re.sub(r"(\w+) Lore %s" % DC, r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2 Lore</span>", string)
+    string = re.sub(r"%s (\w+) save" % DC, r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span> save", string)
+    string = re.sub(r"%s flat check" % DC, r"<span data-pf2-check='flat' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='owner'>Flat Check</span>", string)
 
     # Catch capitalized saves
     string = re.sub(r"check='%s'" % SAVES, convert_to_lower, string)
@@ -144,7 +144,7 @@ def reformat(text):
 
     # Add template buttons
     string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"@Template[type:\2|distance:\1]", string)
-    # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span pf2e_data-pf2-effect-area='\2' pf2e_data-pf2-distance='\1' pf2e_data-pf2-traits=''>\1-foot \2</span>", string)
+    # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
 
     string = handle_actions(string)
     string = handle_conditions(string)
