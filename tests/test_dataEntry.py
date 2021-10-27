@@ -41,7 +41,7 @@ class Test(TestCase):
 
         result = dataEntry.spell_sub(test_string, test_spell)
         self.assertEquals(
-            r"@Compendium[pf2e.spells-srd.Plane Shift]{Plane Shift} is cool... and so is Plane Shift", result)
+            r"<em>@Compendium[pf2e.spells-srd.Plane Shift]{Plane Shift}</em> is cool... and so is Plane Shift", result)
 
     def test_handle_actions(self):
         test_string = r"You observe and assess your surroundings with great speed. " \
@@ -100,7 +100,7 @@ class Test(TestCase):
 
         result = dataEntry.handle_spells(test_string)
         self.assertEquals(
-            r"@Compendium[pf2e.spells-srd.Plane Shift]{Plane Shift} is cool... and so is Plane Shift", result)
+            r"<em>@Compendium[pf2e.spells-srd.Plane Shift]{Plane Shift}</em> is cool... and so is Plane Shift", result)
 
 
 
