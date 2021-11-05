@@ -152,10 +152,10 @@ def reformat(text):
     string = handle_feats(string)
     string = handle_spells(string)
 
-    # #Comment out when not entering backgrounds.
-    # string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
-    # string = re.sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
-    # string = re.sub(r"You're trained in", r"</p><p>You're trained in", string)
+    if "Choose two ability boosts" in string:
+        string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
+        string = re.sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
+        string = re.sub(r"You're trained in", r"</p><p>You're trained in", string)
 
     print("\n")
     print(string)
