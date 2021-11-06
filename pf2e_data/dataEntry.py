@@ -72,6 +72,15 @@ def handle_spells(string):
     return string
 
 
+def handle_activation_actions(string):
+    string = re.sub(r"\[free-action\]", r"<span class=\"pf2-icon\">F</span>", string)
+    string = re.sub(r"\[reaction\]", r"<span class=\"pf2-icon\">R</span>", string)
+    string = re.sub(r"\[one-action\]", r"<span class=\"pf2-icon\">1</span>", string)
+    string = re.sub(r"\[two-actions\]", r"<span class=\"pf2-icon\">2</span>", string)
+    string = re.sub(r"\[three-actions\]", r"<span class=\"pf2-icon\">3</span>", string)
+    return string
+
+
 def reformat(text):
     # Initial handling not using regex.
     string = "<p>" + text.replace("’", "'")\
@@ -151,6 +160,7 @@ def reformat(text):
     string = handle_equipment(string)
     string = handle_feats(string)
     string = handle_spells(string)
+    string = handle_activation_actions(string)
 
     if "Choose two ability boosts" in string:
         string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
