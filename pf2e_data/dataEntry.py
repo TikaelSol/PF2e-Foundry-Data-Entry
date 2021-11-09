@@ -132,7 +132,7 @@ def reformat(text):
 
     # Damage rolls
     string = re.sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/r \1d\2 #\3]]{\1d\2 \3}", string)
-    string = re.sub(r" (\d+) (\w*) damage", r" [[/r {\1}[\2] damage]]{\1 \2}", string)
+    string = re.sub(r" (\d+) (\w*) damage", r" [[/r {\1}[\2]]]{\1 \2 Damage}", string)
     string = re.sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r {\1d\2 + \3}[\4]]]{\1d\2 + \3 \4 damage}", string)
     string = re.sub(r"(\d+)d(\d+) persistent (\w*) damage",
                     r"[[/r {\1d\2}[persistent,\3]]]{\1d\2} %sPersistent Damage]{Persistent \3 Damage}" % CONDITION_COMPENDIUM, string)
