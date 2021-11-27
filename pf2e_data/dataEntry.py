@@ -10,7 +10,7 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
-    return re.sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+    return re.sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), re.escape(string), count=1)
 
 
 def condition_sub(string, condition):
