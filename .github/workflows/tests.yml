@@ -19,7 +19,7 @@ jobs:
       - name: List python packages
         run: |
           python -m pip list
-          python -m pip install PyQt4
+          sudo apt-get install xsel
       - name: Python unit tests
         run: |
           python -m unittest
