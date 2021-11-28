@@ -99,10 +99,8 @@ def reformat(text):
     string = string.replace("<p><p>", "<p>")\
         .replace("–", "-")\
         .replace(r"”", r"\"")\
-        .replace(r"“", r"\"")
-    # string = string.replace("Activate", "</p><p><strong>Activate</strong>")
-
-    string = string.replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
+        .replace(r"“", r"\"")\
+        .replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
         .replace("Onset", "</p><p><strong>Onset</strong>")\
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
     string = re.sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
