@@ -14,10 +14,10 @@ class Test(TestCase):
 
     def test_action_full_word_sub(self):
         test_action = r"Steal"
-        test_string = r"you Steal things; and when you Steal things you do not use Stealth"
+        test_string = r"you Steal things; and when you Steal things you don't use Stealth"
 
         result = dataEntry.action_sub(test_string, test_action)
-        self.assertEqual(r"you @Compendium[pf2e.actionspf2e.Steal]{Steal} for creatures; and when you Steal things you do not use Stealth", result)
+        self.assertEqual(r"you @Compendium[pf2e.actionspf2e.Steal]{Steal} things; and when you Steal things you don't use Stealth", result)
 
     def test_condition_sub(self):
         test_condition = r"Blinded"
