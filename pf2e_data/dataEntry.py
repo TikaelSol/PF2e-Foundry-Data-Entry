@@ -81,7 +81,7 @@ def handle_activation_actions(string):
     return string
 
 
-def reformat(text):
+def reformat(text, use_clipboard=False):
     # Initial handling not using regex.
     string = "<p>" + text.replace("’", "'")\
         .replace("Trigger", "<p><strong>Trigger</strong>")\
@@ -99,16 +99,15 @@ def reformat(text):
     string = string.replace("<p><p>", "<p>")\
         .replace("–", "-")\
         .replace(r"”", r"\"")\
-        .replace(r"“", r"\"")
-    # string = string.replace("Activate", "</p><p><strong>Activate</strong>")
-
-    string = string.replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
+        .replace(r"“", r"\"")\
+        .replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
         .replace("Onset", "</p><p><strong>Onset</strong>")\
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
     string = re.sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
     string = string.replace(" </p>", "</p>")
 
+    string = re.sub("Access", "<p><strong>Access</strong>", string, count=1)
     string = re.sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
 
     # Skills and saves
@@ -169,11 +168,14 @@ def reformat(text):
 
     print("\n")
     print(string)
-    cl.copy(string)
+    if use_clipboard:
+        cl.copy(string)
+
+    return string
 
 
 def main():
-    reformat(input())
+    reformat(input(), use_clipboard=True)
 
 
 if __name__ == "__main__":
