@@ -123,7 +123,7 @@ class Test(TestCase):
         test_string = r"Cost the Price of the chosen item " \
                       r"Requirements You haven't used this ability since the last time you were able to purchase goods. " \
                       r"You regularly create convoluted plans and contingencies, using your resources to enact them. You take 1 minute to " \
-                      r"remove your backpack, then "
+                      r"remove your backpack, then..."
         expected = r"<p><strong>Cost</strong> the Price of the chosen item " \
                    r"<p><strong>Requirements</strong> You haven't used this ability since the last time you were able to purchase goods. " \
                    r"You regularly create convoluted plans and contingencies, using your resources to enact them. You take 1 minute to " \
@@ -204,7 +204,7 @@ class Test(TestCase):
                    r"The creature takes half damage.</p><p><strong>Failure</strong> The creature takes full damage " \
                    r"and is pushed 5 feet away from you.</p><p><strong>Critical Failure</strong> The creature takes " \
                    r"double damage and is pushed 10 feet away from you. </p><hr /><p><strong>Heightened (+2)</strong> " \
-                   r"The damage increases by 1d6.</p>"
+                   r"The damage increases by [[/r 1d6]]{1d6}.</p>"
 
         result = dataEntry.reformat(test_string)
         self.assertEqual(expected, result)

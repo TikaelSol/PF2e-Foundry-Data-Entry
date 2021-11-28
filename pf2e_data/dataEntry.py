@@ -107,6 +107,7 @@ def reformat(text, use_clipboard=False):
 
     string = string.replace(" </p>", "</p>")
 
+    string = re.sub("Access", "<p><strong>Access</strong>", string, count=1)
     string = re.sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
 
     # Skills and saves
