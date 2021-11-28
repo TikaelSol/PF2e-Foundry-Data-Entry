@@ -19,7 +19,7 @@ jobs:
       - name: List python packages
         run: |
           python -m pip list
-          pip install gtk
+          python -m pip install gtk
       - name: Python unit tests
         run: |
           python -m unittest
