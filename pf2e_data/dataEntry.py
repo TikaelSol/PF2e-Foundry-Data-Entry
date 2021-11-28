@@ -170,6 +170,8 @@ def reformat(text, use_clipboard=False):
     if use_clipboard:
         cl.copy(string)
 
+    return string
+
 
 def main():
     reformat(input(), use_clipboard=True)
