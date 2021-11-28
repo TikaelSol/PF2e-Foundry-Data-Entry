@@ -19,8 +19,6 @@ jobs:
       - name: List python packages
         run: |
           python -m pip list
-          sudo apt-get install xsel
-          sudo apt-get install xclip
       - name: Python unit tests
         run: |
           python -m unittest
