@@ -1,4 +1,3 @@
-import pyperclip as cl
 from unittest import TestCase
 
 from pf2e_data import dataEntry
