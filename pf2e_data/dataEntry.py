@@ -81,7 +81,7 @@ def handle_activation_actions(string):
     return string
 
 
-def reformat(text, use_clipboard=false):
+def reformat(text, use_clipboard=False):
     # Initial handling not using regex.
     string = "<p>" + text.replace("’", "'")\
         .replace("Trigger", "<p><strong>Trigger</strong>")\
@@ -172,7 +172,7 @@ def reformat(text, use_clipboard=false):
 
 
 def main():
-    reformat(input(), use_clipboard=true)
+    reformat(input(), use_clipboard=True)
 
 
 if __name__ == "__main__":
