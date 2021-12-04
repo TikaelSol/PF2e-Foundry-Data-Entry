@@ -81,6 +81,49 @@ def handle_activation_actions(string):
     return string
 
 
+def handle_damage_rolls(string):
+    string = re.sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/r \1d\2 #\3]]{\1d\2 \3}", string)
+    string = re.sub(r" (\d+) (\w*) damage", r" [[/r {\1}[\2]]]{\1 \2 Damage}", string)
+    string = re.sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r {\1d\2 + \3}[\4]]]{\1d\2 + \3 \4 damage}", string)
+    string = re.sub(r"(\d+)d(\d+) persistent (\w*) damage",
+                    r"[[/r {\1d\2}[persistent,\3]]]{\1d\2} %sPersistent Damage]{Persistent \3 Damage}"
+                    % CONDITION_COMPENDIUM, string)
+    string = re.sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r {\1d\2}[\3]]]{\1d\2 \3 damage}", string)
+    string = re.sub(r"(\d+)d(\d+) (\w+)(\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
+    string = re.sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]]{\1d\2}.", string)
+    return string
+
+
+def handle_spell_heightening(string):
+    string = re.sub(r"Heightened \(", r"<hr />Heightened (", string, count=1)
+    string = re.sub(r"Heightened \(\+(\d+)\)", r"</p><p><strong>Heightened (+\1)</strong>", string)
+    string = re.sub(r"Heightened \((\d+)(\w+)\)", r"</p><p><strong>Heightened (\1\2)</strong>", string)
+    string = re.sub(r"<hr /></p><p><strong>Heightened", r"</p><hr /><p><strong>Heightened", string)
+    return string
+
+
+def handle_bullet_lists(string):
+    # Removing bullet points, should replace with the actual bullet points.
+    # string = re.sub(r"»", r"•", string)
+    string = re.sub(r"•", "<ul><li>", string, count=1)
+    string = re.sub(r"•", "</li><li>", string)
+    return string
+
+
+def handle_templates(string):
+    # Add template buttons
+    string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"@Template[type:\2|distance:\1]", string)
+    # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
+    return string
+
+
+def handle_background(string):
+    string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
+    string = re.sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
+    string = re.sub(r"You're trained in", r"</p><p>You're trained in", string)
+    return string
+
+
 def reformat(text, use_clipboard=False):
     # Initial handling not using regex.
     string = "<p>" + text.replace("’", "'")\
@@ -129,30 +172,10 @@ def reformat(text, use_clipboard=False):
     string = re.sub(r"check='%s'" % SAVES, convert_to_lower, string)
     string = re.sub(r"check='%s'" % SKILLS, convert_to_lower, string)
 
-    # Damage rolls
-    string = re.sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/r \1d\2 #\3]]{\1d\2 \3}", string)
-    string = re.sub(r" (\d+) (\w*) damage", r" [[/r {\1}[\2]]]{\1 \2 Damage}", string)
-    string = re.sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r {\1d\2 + \3}[\4]]]{\1d\2 + \3 \4 damage}", string)
-    string = re.sub(r"(\d+)d(\d+) persistent (\w*) damage",
-                    r"[[/r {\1d\2}[persistent,\3]]]{\1d\2} %sPersistent Damage]{Persistent \3 Damage}" % CONDITION_COMPENDIUM, string)
-    string = re.sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r {\1d\2}[\3]]]{\1d\2 \3 damage}", string)
-    string = re.sub(r"(\d+)d(\d+) (\w+)(\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
-    string = re.sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]]{\1d\2}.", string)
-
-    # Spell heightening handling
-    string = re.sub(r"Heightened \(", r"<hr />Heightened (", string, count=1)
-    string = re.sub(r"Heightened \(\+(\d+)\)", r"</p><p><strong>Heightened (+\1)</strong>", string)
-    string = re.sub(r"Heightened \((\d+)(\w+)\)", r"</p><p><strong>Heightened (\1\2)</strong>", string)
-    string = re.sub(r"<hr /></p><p><strong>Heightened", r"</p><hr /><p><strong>Heightened", string)
-
-    # Removing bullet points, should replace with the actual bullet points.
-    # string = re.sub(r"»", r"•", string)
-    string = re.sub(r"•", "<ul><li>", string, count=1)
-    string = re.sub(r"•", "</li><li>", string)
-
-    # Add template buttons
-    string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"@Template[type:\2|distance:\1]", string)
-    # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
+    string = handle_damage_rolls(string)
+    string = handle_spell_heightening(string)
+    string = handle_bullet_lists(string)
+    string = handle_templates(string)
 
     string = handle_actions(string)
     string = handle_conditions(string)
@@ -162,9 +185,7 @@ def reformat(text, use_clipboard=False):
     string = handle_activation_actions(string)
 
     if "Choose two ability boosts" in string:
-        string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
-        string = re.sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
-        string = re.sub(r"You're trained in", r"</p><p>You're trained in", string)
+        string = handle_background(string)
 
     print("\n")
     print(string)
