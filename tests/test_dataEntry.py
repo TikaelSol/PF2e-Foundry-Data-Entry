@@ -121,7 +121,7 @@ class Test(TestCase):
 
     def test_handle_background(self):
         test_string = r"Choose two ability boosts. One must be to Intelligence or Charisma, and one is a free " \
-                      r"ability boost. You're trained in Arcana, and the Academia Lore skill. " \
+                      r"ability boost. You're trained in Arcana and the Academia Lore skill. " \
                       r"You gain the Dubious Knowledge skill feat."
         expected = r"<p></p><p>Choose two ability boosts. One must be to <strong>Intelligence</strong> or " \
                    r"<strong>Charisma</strong>, and one is a free ability boost. </p><p>You're trained in Arcana " \
@@ -136,7 +136,7 @@ class Test(TestCase):
                       r"or perhaps it was just too much for you. Whatever the case, your exit from the academy has " \
                       r"shaped your life as much as your entrance and led you to a life of adventure. " \
                       r"Choose two ability boosts. One must be to Intelligence or Charisma, and one is a free " \
-                      r"ability boost. You're trained in Arcana, and the Academia Lore skill. " \
+                      r"ability boost. You're trained in Arcana and the Academia Lore skill. " \
                       r"You gain the Dubious Knowledge skill feat."
         expected = r"<p>You were enrolled at a prestigious magical academy, but you've since dropped out. " \
                    r"Maybe there was a momentous incident, maybe you had to return to other responsibilities, " \
