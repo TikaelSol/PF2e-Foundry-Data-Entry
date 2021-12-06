@@ -104,11 +104,9 @@ def handle_spell_heightening(string):
 
 def handle_bullet_lists(string):
     # Removing bullet points, should replace with the actual bullet points.
-    # string = re.sub(r"»", r"•", string)
     string = re.sub(r"•", "<ul><li>", string, count=1)
     string = re.sub(r"•", "</li><li>", string)
     return string
-
 
 def handle_templates(string):
     # Add template buttons
@@ -116,6 +114,11 @@ def handle_templates(string):
     # string = re.sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
     return string
 
+def handle_third_party(string):
+    # Handling for 3rd party formatting.
+    string = re.sub(r"» (Critical Success|Success|Failure|Critical Failure)", r"</p><p><strong>\1</strong>", string)
+    string = re.sub(r"»", r"•", string)
+    return string
 
 def handle_background(string):
     string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
@@ -176,7 +179,10 @@ def reformat(text, use_clipboard=False):
     string = handle_spell_heightening(string)
     string = handle_bullet_lists(string)
     string = handle_templates(string)
-
+    
+    # Uncomment for third party formatting
+    # string = handle_third_party(string)
+    
     string = handle_actions(string)
     string = handle_conditions(string)
     string = handle_equipment(string)
