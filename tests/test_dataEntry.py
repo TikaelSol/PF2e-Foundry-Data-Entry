@@ -205,7 +205,7 @@ class Test(TestCase):
                    r"<strong>Requirements</strong> The mirror robe was last activated to draw attention toward you, " \
                    r"or you haven't used the mirror robe today;</p><p><strong>Effect</strong> The mirror robe " \
                    r"Creates a Diversion for you with a +9 Deception modifier. " \
-                   r"Activate <span class=\"pf2-icon\">1</span> Interact (visual); " \
+                   r"Activate <span class=\"pf2-icon\">1</span> Interact (visual);" \
                    r"<p><strong>Requirements</strong> The mirror robe was last activated to divert attention away " \
                    r"from you and you are @Compendium[pf2e.conditionitems.Hidden]{Hidden} or undetected by at least " \
                    r"one foe;</p><p><strong>Effect</strong> You draw attention toward yourself. Choose one foe to " \
