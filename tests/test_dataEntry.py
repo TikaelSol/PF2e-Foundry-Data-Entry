@@ -123,9 +123,9 @@ class Test(TestCase):
         test_string = r"Choose two ability boosts. One must be to Intelligence or Charisma, and one is a free " \
                       r"ability boost. You're trained in Arcana and Academia Lore. " \
                       r"You gain the Dubious Knowledge skill feat."
-        expected = r"<p></p><p>Choose two ability boosts. One must be to <strong>Intelligence</strong> or " \
+        expected = r"<p>Choose two ability boosts. One must be to <strong>Intelligence</strong> or " \
                    r"<strong>Charisma</strong>, and one is a free ability boost. </p><p>You're trained in Arcana " \
-                   r"and Academia Lore. You gain the Dubious Knowledge skill feat.</p>"
+                   r"and Academia Lore. You gain the @Compendium[pf2e.feats-srd.Dubious Knowledge]{Dubious Knowledge} skill feat.</p>"
 
         result = dataEntry.reformat(test_string)
         self.assertEqual(expected, result)
@@ -144,7 +144,7 @@ class Test(TestCase):
                    r"shaped your life as much as your entrance and led you to a life of adventure. " \
                    r"</p><p>Choose two ability boosts. One must be to <strong>Intelligence</strong> or " \
                    r"<strong>Charisma</strong>, and one is a free ability boost. </p><p>You're trained in Arcana " \
-                   r"and Academia Lore. You gain the Dubious Knowledge skill feat.</p>"
+                   r"and Academia Lore. You gain the @Compendium[pf2e.feats-srd.Dubious Knowledge]{Dubious Knowledge} skill feat.</p>"
 
         result = dataEntry.reformat(test_string)
         self.assertEqual(expected, result)
@@ -201,7 +201,7 @@ class Test(TestCase):
                       "attention to you, becoming flat-footed to your\nallies until the beginning of your next turn. " \
                       "If you are\ninvisible or otherwise can’t become observed, you can’t\nuse this activation."
         expected = r"<p>Thousands of small, reflective, mirrored glass shards have been carefully stitched down this " \
-                   r"long silk duster. Activate <span class=\"pf2-icon\">1</span> Interact; <p>" \
+                   r"long silk duster. Activate <span class=\"pf2-icon\">1</span> Interact;</p><p>" \
                    r"<strong>Requirements</strong> The mirror robe was last activated to draw attention toward you, " \
                    r"or you haven't used the mirror robe today;</p><p><strong>Effect</strong> The mirror robe " \
                    r"Creates a Diversion for you with a +9 Deception modifier. " \
