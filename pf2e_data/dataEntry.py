@@ -124,6 +124,7 @@ def handle_background(string):
     string = re.sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
     string = re.sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
     string = re.sub(r"You're trained in", r"</p><p>You're trained in", string)
+    string = re.sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
     return string
 
 
@@ -151,7 +152,9 @@ def reformat(text, use_clipboard=False):
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
     string = re.sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
-    string = string.replace(" </p>", "</p>")
+    string = string.replace(" </p>", "</p>")\
+        .replace("<p></p>", "")\
+        .replace("; <p>", ";</p><p>")
 
     string = re.sub("Access", "<p><strong>Access</strong>", string, count=1)
     string = re.sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
