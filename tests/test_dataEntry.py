@@ -123,7 +123,7 @@ class Test(TestCase):
         test_string = r"Choose two ability boosts. One must be to Intelligence or Charisma, and one is a free " \
                       r"ability boost. You're trained in Arcana and Academia Lore. " \
                       r"You gain the Dubious Knowledge skill feat."
-        expected = r"<p>Choose two ability boosts. One must be to <strong>Intelligence</strong> or " \
+        expected = r"<p></p><p>Choose two ability boosts. One must be to <strong>Intelligence</strong> or " \
                    r"<strong>Charisma</strong>, and one is a free ability boost. </p><p>You're trained in Arcana " \
                    r"and Academia Lore. You gain the @Compendium[pf2e.feats-srd.Dubious Knowledge]{Dubious Knowledge} skill feat.</p>"
 
@@ -205,7 +205,7 @@ class Test(TestCase):
                    r"<strong>Requirements</strong> The mirror robe was last activated to draw attention toward you, " \
                    r"or you haven't used the mirror robe today;</p><p><strong>Effect</strong> The mirror robe " \
                    r"Creates a Diversion for you with a +9 Deception modifier. " \
-                   r"Activate <span class=\"pf2-icon\">1</span> Interact (visual);" \
+                   r"Activate <span class=\"pf2-icon\">1</span> Interact (visual);</p>" \
                    r"<p><strong>Requirements</strong> The mirror robe was last activated to divert attention away " \
                    r"from you and you are @Compendium[pf2e.conditionitems.Hidden]{Hidden} or undetected by at least " \
                    r"one foe;</p><p><strong>Effect</strong> You draw attention toward yourself. Choose one foe to " \
