@@ -128,7 +128,7 @@ def handle_background(string):
     return string
 
 def handle_aura(string):
-    string = re.sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}", string)
+    string = re.sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
     return string
 
 
