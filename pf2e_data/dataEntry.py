@@ -127,6 +127,10 @@ def handle_background(string):
     string = re.sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
     return string
 
+def handle_aura(string):
+    string = re.sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}", string)
+    return string
+
 
 def reformat(text, use_clipboard=False):
     # Initial handling not using regex.
@@ -192,6 +196,7 @@ def reformat(text, use_clipboard=False):
     string = handle_feats(string)
     string = handle_spells(string)
     string = handle_activation_actions(string)
+    string = handle_aura(string)
 
     if "Choose two ability boosts" in string:
         string = handle_background(string)
