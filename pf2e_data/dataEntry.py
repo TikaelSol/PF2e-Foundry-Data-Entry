@@ -131,6 +131,16 @@ def handle_aura(string):
     string = re.sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
     return string
 
+def companion_format(string):
+    string = re.sub(r"Size (Tiny|Small|Medium|Large)", r"<p><strong>Size</strong> \1</p>", string)
+    string = re.sub(r"Melee \? (\w+), Damage (\d+)d(\d+) (\w+)", r"<p><strong>Melee</strong> <span class=\"pf2-icon\">1</span> \1, <strong>Damage</strong> \2d\3 \4</p>", string)
+    string = re.sub(r"Str ", r"<p><strong>Str</strong> ", string)
+    string = re.sub(r"(Dex|Con|Int|Wis|Cha) ", r"<strong>\1</strong> ", string)
+    string = re.sub(r"Hit Points (\d+)", r"</p><p><strong>Hit Points</strong> \1</p>", string)
+    string = re.sub(r"(Skill|Senses|Speed|Support Benefit|Advanced Maneuver)", r"</p><p><strong>\1</strong>", string)
+    
+    return string
+
 
 def reformat(text, use_clipboard=False):
     # Initial handling not using regex.
@@ -189,6 +199,9 @@ def reformat(text, use_clipboard=False):
     
     # Uncomment for third party formatting
     # string = handle_third_party(string)
+    
+    # Uncomment for importing Companion stat blocks
+    # string = companion_format(string)
     
     string = handle_actions(string)
     string = handle_conditions(string)
