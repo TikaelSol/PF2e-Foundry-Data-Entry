@@ -133,11 +133,18 @@ def handle_aura(string):
 
 def companion_format(string):
     string = re.sub(r"Size (Tiny|Small|Medium|Large)", r"<p><strong>Size</strong> \1</p>", string)
-    string = re.sub(r"Melee \? (\w+), Damage (\d+)d(\d+) (\w+)", r"<p><strong>Melee</strong> <span class=\"pf2-icon\">1</span> \1, <strong>Damage</strong> \2d\3 \4</p>", string)
+    string = re.sub(r"Melee \? (\w+)(,|;) Damage (\d+)d(\d+) (\w+)", r"<p><strong>Melee</strong> <span class='pf2-icon'>1</span> \1, <strong>Damage</strong> \3d\4 \5</p>", string)
+    string = re.sub(r"Melee \? (\w+) \(([^\)]+)\)(,|;) Damage (\d+)d(\d+) (\w+)", r"<p><strong>Melee</strong> <span class='pf2-icon'>1</span> \1 (\2), <strong>Damage</strong> \4d\5 \6</p>", string)
     string = re.sub(r"Str ", r"<p><strong>Str</strong> ", string)
     string = re.sub(r"(Dex|Con|Int|Wis|Cha) ", r"<strong>\1</strong> ", string)
     string = re.sub(r"Hit Points (\d+)", r"</p><p><strong>Hit Points</strong> \1</p>", string)
     string = re.sub(r"(Skill|Senses|Speed|Support Benefit|Advanced Maneuver)", r"</p><p><strong>\1</strong>", string)
+    
+    return string
+
+def eidolon_format(string):
+    string = re.sub(r"(Tradition|Traits|Alignment|Home Plane|Size|Suggested Attacks|Skills|Senses|Language|Speed|Eidolon Abilities)", r"</p><p><strong>\1</strong>", string)
+    string = re.sub(r"(\w+) (\w+) Str (\d+), Dex (\d+), Con (\d+), Int (\d+), Wis (\d+), Cha (\d+); \+(\d+) AC \(\+(\d+) Dex cap\)", r"</p><p><strong>\1 \2</strong> Str \3, Dex \4, Con \5, Int \6, Wis \7, Cha \8; +\9 AC (+\10 Dex cap)", string)
     
     return string
 
