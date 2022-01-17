@@ -193,7 +193,8 @@ def reformat(text, use_clipboard=False):
         .replace("Onset", "</p><p><strong>Onset</strong>")\
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
     string = re.sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
-
+    string = string.replace("<p></p>","")
+    string = string.replace(" <p>","</p></p>")
     string = string.replace(" </p>", "</p>")
 
     string = re.sub("Access", "<p><strong>Access</strong>", string, count=1)
