@@ -191,7 +191,7 @@ class Test(TestCase):
 
     def test_reformat_worn_item(self):
         test_string = "Thousands of small, reflective, mirrored glass shards have been carefully stitched down this " \
-                    "long silk duster. Activate [one-action] Interact; Requirements The mirror robe was last activated " \ 
+                    "long silk duster. Activate [one-action] Interact; Requirements The mirror robe was last activated " \
                     "to draw attention toward you, or you haven’t used the mirror robe today; Effect The mirror robe  " \
                     "Creates a Diversion for you with a +9 Deception modifier. Activate [one-action] Interact (visual); " \
                     "Requirements The mirror robe was last activated to divert attention away from you and you are hidden " \
