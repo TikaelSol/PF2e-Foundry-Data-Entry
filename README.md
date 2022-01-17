@@ -1,5 +1,4 @@
 # PF2e-Foundry-Data-Entry
-[![Actions Status](https://github.com/TikaelSol/PF2e-Foundry-Data-Entry/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/TikaelSol/PF2e-Foundry-Data-Entry/actions)
 
 A script to aid with data entry for the PF2e system for Foundry VTT
 
