@@ -190,30 +190,26 @@ class Test(TestCase):
         self.assertEqual(expected, result)
 
     def test_reformat_worn_item(self):
-        test_string = "Thousands of small, reflective, mirrored glass shards have\nbeen carefully stitched down " \
-                      "this long silk duster.\nActivate [one-action] Interact; Requirements The mirror robe was " \
-                      "last\nactivated to draw attention toward you, or you haven’t\nused the mirror robe today; " \
-                      "Effect The mirror robe Creates\na Diversion for you with a +9 Deception modifier.\n" \
-                      "Activate [one-action] Interact (visual); Requirements The mirror robe\nwas last activated to " \
-                      "divert attention away from you\nand you are hidden or undetected by at least one foe;\n" \
-                      "Effect You draw attention toward yourself. Choose one\nfoe to which you were hidden or " \
-                      "undetected. You reveal\nyourself to all, becoming observed. The foe you chose\ndiverts its " \
-                      "attention to you, becoming flat-footed to your\nallies until the beginning of your next turn. " \
-                      "If you are\ninvisible or otherwise can’t become observed, you can’t\nuse this activation."
-        expected = r"<p>Thousands of small, reflective, mirrored glass shards have been carefully stitched down this " \
-                   r"long silk duster. Activate <span class=\"pf2-icon\">1</span> Interact;</p><p>" \
-                   r"<strong>Requirements</strong> The mirror robe was last activated to draw attention toward you, " \
-                   r"or you haven't used the mirror robe today;</p><p><strong>Effect</strong> The mirror robe " \
-                   r"Creates a Diversion for you with a +9 Deception modifier. " \
-                   r"Activate <span class=\"pf2-icon\">1</span> Interact (visual);</p>" \
-                   r"<p><strong>Requirements</strong> The mirror robe was last activated to divert attention away " \
-                   r"from you and you are @Compendium[pf2e.conditionitems.Hidden]{Hidden} or undetected by at least " \
-                   r"one foe;</p><p><strong>Effect</strong> You draw attention toward yourself. Choose one foe to " \
-                   r"which you were hidden or undetected. You reveal yourself to all, becoming observed. The foe you " \
-                   r"chose diverts its attention to you, becoming @Compendium[pf2e.conditionitems.Flat-Footed]{Flat-Footed} " \
-                   r"to your allies until the beginning of your next turn. If you are " \
-                   r"@Compendium[pf2e.conditionitems.Invisible]{Invisible} or otherwise can't become observed, you " \
-                   r"can't use this activation.</p>"
+        test_string = "Thousands of small, reflective, mirrored glass shards have been carefully stitched down this " \
+                    "long silk duster. Activate [one-action] Interact; Requirements The mirror robe was last activated " \ 
+                    "to draw attention toward you, or you haven’t used the mirror robe today; Effect The mirror robe  " \
+                    "Creates a Diversion for you with a +9 Deception modifier. Activate [one-action] Interact (visual); " \
+                    "Requirements The mirror robe was last activated to divert attention away from you and you are hidden " \
+                    "or undetected by at least one foe; Effect You draw attention toward yourself. Choose one foe to which " \
+                    "you were hidden or undetected. You reveal yourself to all, becoming observed. The foe you chose diverts " \
+                    "its attention to you, becoming flat-footed to your allies until the beginning of your next turn. If you " \
+                    "are invisible or otherwise can’t become observed, you can’t use this activation."
+        expected = r"<p>Thousands of small, reflective, mirrored glass shards have been carefully stitched down this long silk " \
+                    r"duster. Activate <span class=\"pf2-icon\">1</span> Interact; <p><strong>Requirements</strong> The mirror " \
+                    r"robe was last activated to draw attention toward you, or you haven't used the mirror robe today;</p><p>" \
+                    r"<strong>Effect</strong> The mirror robe Creates a Diversion for you with a +9 Deception modifier. Activate " \
+                    r"<span class=\"pf2-icon\">1</span> Interact (visual); <p><strong>Requirements</strong> The mirror robe was " \
+                    r"last activated to divert attention away from you and you are @Compendium[pf2e.conditionitems.Hidden]{Hidden} " \
+                    r"or undetected by at least one foe;</p><p><strong>Effect</strong> You draw attention toward yourself. Choose " \
+                    r"one foe to which you were hidden or undetected. You reveal yourself to all, becoming observed. The foe you " \
+                    r"chose diverts its attention to you, becoming @Compendium[pf2e.conditionitems.Flat-Footed]{Flat-Footed} to " \
+                    r"your allies until the beginning of your next turn. If you are " \
+                    r" @Compendium[pf2e.conditionitems.Invisible]{Invisible} or otherwise can't become observed, you can't use this activation.</p>"
 
         result = dataEntry.reformat(test_string)
         self.assertEqual(expected, result)
