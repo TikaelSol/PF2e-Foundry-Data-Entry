@@ -148,6 +148,27 @@ def eidolon_format(string):
     
     return string
 
+def handle_inlines_checks(string):
+    # Skills and saves
+    string = re.sub(r"%s basic (\w+) save" % DC, r"@Check[type:\2|dc:\1|basic:true]", string)
+    string = re.sub(r"%s %s" % (DC, SAVES), r"@Check[type:\2|dc:\1]", string)
+    string = re.sub(r"%s %s" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
+    string = re.sub(r"%s \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
+    string = re.sub(r"%s save \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
+
+    string = re.sub(r"%s %s" % (DC, SKILLS), r"@Check[type:\2|dc:\1]", string)
+    string = re.sub(r"%s %s" % (SKILLS, DC), r"@Check[type:\1|dc:\2]", string)
+    string = re.sub(r"%s \(%s\)" % (SKILLS, DC), r"@Check[type:\1|dc:\2", string)
+
+    string = re.sub(r"(\w+) Lore %s" % DC, r"@Check[type:\2|dc:\1]", string)
+    string = re.sub(r"%s (\w+) save" % DC, r"@Check[type:\2|dc:\1]", string)
+    string = re.sub(r"%s flat check" % DC, r"@Check[type:flat|dc:\1]", string)
+
+    # Catch capitalized saves
+    string = re.sub(r"type:%s" % SAVES, convert_to_lower, string)
+    string = re.sub(r"type:%s" % SKILLS, convert_to_lower, string)
+    
+    return string
 
 def reformat(text, use_clipboard=False):
     # Initial handling not using regex.
@@ -173,42 +194,26 @@ def reformat(text, use_clipboard=False):
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
     string = re.sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
-    string = string.replace(" </p>", "</p>")\
-        .replace("<p></p>", "")\
-        .replace("; <p>", ";</p><p>")
+    string = string.replace(" </p>", "</p>")
 
     string = re.sub("Access", "<p><strong>Access</strong>", string, count=1)
     string = re.sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
 
-    # Skills and saves
-    string = re.sub(r"%s basic (\w+) save" % DC, r"<span data-pf2-check='\2' data-pf2-traits='damaging-effect' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>basic \2</span> save", string)
-    string = re.sub(r"%s %s" % (DC, SAVES), r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>", string)
-    string = re.sub(r"%s %s" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
-    string = re.sub(r"%s \(%s\)" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
-    string = re.sub(r"%s save \(%s\)" % (SAVES, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
-
-    string = re.sub(r"%s %s" % (DC, SKILLS), r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span>", string)
-    string = re.sub(r"%s %s" % (SKILLS, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
-    string = re.sub(r"%s \(%s\)" % (SKILLS, DC), r"<span data-pf2-check='\1' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\2' data-pf2-show-dc='gm'>\1</span>", string)
-
-    string = re.sub(r"(\w+) Lore %s" % DC, r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2 Lore</span>", string)
-    string = re.sub(r"%s (\w+) save" % DC, r"<span data-pf2-check='\2' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='gm'>\2</span> save", string)
-    string = re.sub(r"%s flat check" % DC, r"<span data-pf2-check='flat' data-pf2-traits='' data-pf2-label='' data-pf2-dc='\1' data-pf2-show-dc='owner'>Flat Check</span>", string)
-
-    # Catch capitalized saves
-    string = re.sub(r"check='%s'" % SAVES, convert_to_lower, string)
-    string = re.sub(r"check='%s'" % SKILLS, convert_to_lower, string)
+    # Uncomment for third party formatting
+    # string = handle_third_party(string)
+    
+    # Uncomment for handling animal companion blocks
+    # string = companion_format(string)
+    
+    # Uncomment for handling eidolon blocks
+    # string = eidolon_format(string)
+    
+    string = handle_inlines_checks(string)
 
     string = handle_damage_rolls(string)
     string = handle_spell_heightening(string)
     string = handle_bullet_lists(string)
     string = handle_templates(string)
-    
-    # Uncomment for third party formatting
-    # string = handle_third_party(string)
-    
-    # Uncomment for importing Companion stat blocks
-    # string = companion_format(string)
     
     string = handle_actions(string)
     string = handle_conditions(string)
@@ -227,7 +232,6 @@ def reformat(text, use_clipboard=False):
         cl.copy(string)
 
     return string
-
 
 def main():
     reformat(input(), use_clipboard=True)
