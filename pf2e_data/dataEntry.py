@@ -1,7 +1,7 @@
 import regex as re
 import pyperclip as cl
 
-from pf2e_data.constants import *
+from constants import *
 
 
 def convert_to_lower(match_obj):
