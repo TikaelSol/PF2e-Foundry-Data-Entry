@@ -149,6 +149,7 @@ def eidolon_format(string):
     return string
 
 def handle_inlines_checks(string):
+    
     # Skills and saves
     string = re.sub(r"%s basic (\w+) save" % DC, r"@Check[type:\2|dc:\1|basic:true]", string)
     string = re.sub(r"%s %s" % (DC, SAVES), r"@Check[type:\2|dc:\1]", string)
@@ -193,8 +194,8 @@ def reformat(text, use_clipboard=False):
         .replace("Onset", "</p><p><strong>Onset</strong>")\
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
     string = re.sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
-    string = string.replace("<p></p>","")
-    string = string.replace(" <p>","</p></p>")
+    string = string.replace(";</p>","</p>")
+    string = string.replace(" <p>","</p><p>")
     string = string.replace(" </p>", "</p>")
 
     string = re.sub("Access", "<p><strong>Access</strong>", string, count=1)
@@ -226,6 +227,8 @@ def reformat(text, use_clipboard=False):
 
     if "Choose two ability boosts" in string:
         string = handle_background(string)
+        
+    string = string.replace("<p></p>","").replace("<p><p>","<p>")
 
     print("\n")
     print(string)
@@ -233,6 +236,7 @@ def reformat(text, use_clipboard=False):
         cl.copy(string)
 
     return string
+
 
 def main():
     reformat(input(), use_clipboard=True)
