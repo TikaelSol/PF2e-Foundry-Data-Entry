@@ -1,6 +1,8 @@
 # PF2e-Foundry-Data-Entry
 
-A script to aid with data entry for the PF2e system for Foundry VTT
+A script to aid with data entry for the PF2e system for Foundry VTT. This script is available as a standalone .exe file, a .py script, or a .ipynb file available to run on Binder.  The easiest experience will come from using the exe file but the .py file allows for more in depth customization.
+
+To use the standalone simply download and run dataEntry.exe, paste the unformatted text into the input on the left and click the reformat button. Settings are available to enable specific text block types. Third party data entry mode attempts to resolve some formatting that exists in places in third party PDFS that is not used in Paizo PDFs.
 
 To run it you must either use the binder link [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/TikaelSol/PF2e-Foundry-Data-Entry/HEAD) or download the repository.
 
