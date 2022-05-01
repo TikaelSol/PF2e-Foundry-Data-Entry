@@ -1,6 +1,6 @@
 from regex import sub
 from pyperclip import copy
-# from tkinter import Tk, Frame, Canvas, Text, Button, END, Checkbutton, BooleanVar
+from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu
 
 from constants import *
 
@@ -183,10 +183,9 @@ def ancestry_format(string):
     
     return string
 
-def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=False):
+def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True):
     # Initial handling not using regex.
-    string = "<p>" + text.replace("’", "'")\
-        .replace("Trigger", "<p><strong>Trigger</strong>")\
+    string = "<p>" + text.replace("Trigger", "<p><strong>Trigger</strong>")\
         .replace("Requirements", "<p><strong>Requirements</strong>")\
         .replace("\nCritical Success", "</p><hr /><p><strong>Critical Success</strong>")\
         .replace("\nSuccess", "</p><p><strong>Success</strong>")\
@@ -198,12 +197,15 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         .replace("Effect", "</p><p><strong>Effect</strong>")\
         .replace("Cost", "<strong>Cost</strong>") + "</p>"
     string = string.replace("<p><p>", "<p>")\
-        .replace("–", "-")\
         .replace(r"”", r"\"")\
         .replace(r"“", r"\"")\
         .replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
         .replace("Onset", "</p><p><strong>Onset</strong>")\
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
+        
+    if remove_non_ASCII:
+        string = string.replace("–", "-").replace("’", "'")
+    
     string = sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
     string = sub("Access", "<p><strong>Access</strong>", string, count=1)
@@ -220,19 +222,28 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     
     if ancestry:
         string = ancestry_format(string)
+        
+    if add_inline_checks:
+        string = handle_inlines_checks(string)
     
-    string = handle_inlines_checks(string)
+    if add_conditions:
+        string = handle_conditions(string)
 
-    string = handle_damage_rolls(string)
+    if inline_rolls:
+        string = handle_damage_rolls(string)
+    
+    if add_inline_templates:
+        string = handle_templates(string)
+    
     string = handle_spell_heightening(string)
     string = handle_bullet_lists(string)
-    string = handle_templates(string)
     
     string = handle_actions(string)
-    string = handle_conditions(string)
+    
     string = handle_equipment(string)
     string = handle_feats(string)
     string = handle_spells(string)
+    
     string = handle_activation_actions(string)
     string = handle_aura(string)
     
@@ -241,12 +252,18 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         string = handle_background(string)
         
     string = string.replace("<p></p>","").replace("<p><p>","<p>")
-    string = string.replace(";</p>","</p>")
     string = string.replace(" <p>","</p><p>")
     string = string.replace(" </p>", "</p>")
+    string = string.replace(";</p>","</p>")
+    
+            
+    if add_gm_text:
+        string = string.replace("<p><strong>Trigger</strong>", "<p data-visibility='gm'><strong>Trigger</strong>")
+        string = string.replace("<p><strong>Requirements</strong>", "<p data-visibility='gm'><strong>Requirements</strong>")
+        string = string.replace("<p><strong>Frequency</strong>", "<p data-visibility='gm'><strong>Frequency</strong>")
 
-    # print("\n")
-    # print(string)
+    print("\n")
+    print(string)
 
     if use_clipboard:
         copy(string)
@@ -263,13 +280,9 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 
 # root = Tk()
 
-# third_party = BooleanVar()
-# companion = BooleanVar()
-# eidolon = BooleanVar()
-# ancestry = BooleanVar()
-# use_clipboard = BooleanVar(value = True)
 
-# root.title("PF2e on Foundry VTT Data Entry v 2.0")
+
+# root.title("PF2e on Foundry VTT Data Entry v 2.1")
 
 # canvas = Canvas(root, height = Height, width = Width)
 # canvas.pack()
@@ -282,6 +295,20 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 
 # outputText = Text(frame, bg = 'white')
 # outputText.place(relx = 0.51, rely = 0.2, relwidth = 0.49, relheight = 0.8)
+
+## Settings
+###############################################################################
+# third_party = BooleanVar()
+# companion = BooleanVar()
+# eidolon = BooleanVar()
+# ancestry = BooleanVar()
+# use_clipboard = BooleanVar(value = True)
+# add_gm_text = BooleanVar(value = True)
+# inline_rolls = BooleanVar(value = True)
+# add_conditions = BooleanVar(value = True)
+# add_inline_checks = BooleanVar(value = True)
+# add_inline_templates = BooleanVar(value = True)
+# remove_non_ASCII = BooleanVar(value = True)
 
 # handleThirdParty = Checkbutton(text = "Support Third Party", variable = third_party)
 # handleThirdParty.place(relx = 0.3, rely= 0)
@@ -297,8 +324,34 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 
 # useClipboard = Checkbutton(text = "Copy Output to Clipboard", variable = use_clipboard)
 # useClipboard.place(relx = 0.5, rely= 0.05)
+###############################################################################
 
-# reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get()))
+
+## Build settings menu
+###############################################################################
+
+# menu = Menu(root)
+
+# settings_menu = Menu(menu)
+# settings_menu.add_checkbutton(label = "Copy Output to Clipboard", variable = use_clipboard)
+# settings_menu.add_checkbutton(label = "Add GM Only Tags", variable = add_gm_text)
+# settings_menu.add_checkbutton(label = "Handle Inline rolls", variable = inline_rolls)
+# settings_menu.add_checkbutton(label = "Add Inline Templates", variable = add_inline_templates)
+# settings_menu.add_checkbutton(label = "Add Inline Checks", variable = add_inline_checks)
+# settings_menu.add_checkbutton(label = "Add Condition Links", variable = add_conditions)
+# settings_menu.add_checkbutton(label = "Remove non-ASCII characters", variable = remove_non_ASCII)
+# settings_menu.add_checkbutton(label = "Handle Animal Companion Blocks", variable = companion)
+# settings_menu.add_checkbutton(label = "Handle Eidolon Blocks", variable = eidolon)
+# settings_menu.add_checkbutton(label = "Handle Ancestry Description Text", variable = ancestry)
+# settings_menu.add_checkbutton(label = "Handle Third Party Formatting", variable = third_party)
+
+# menu.add_cascade(label = "Settings", menu = settings_menu)
+# root.config(menu = menu)
+
+
+# ###############################################################################
+
+# reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), add_conditions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get()))
 # reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
 
 # resetButton = Button(root, text="Clear Input", command = lambda: clearInput())
@@ -306,7 +359,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 
 
 def main():
-    reformat(input(), third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True)
+    reformat(input(), third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True)
     # root.mainloop()
 
 
