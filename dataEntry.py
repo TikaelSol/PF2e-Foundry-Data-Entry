@@ -1,6 +1,6 @@
 from regex import sub
 from pyperclip import copy
-from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu
+# from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu
 
 from constants import *
 
@@ -111,8 +111,9 @@ def handle_bullet_lists(string):
 
 def handle_templates(string):
     # Add template buttons
-    string = sub(r"(\d+)-foot (emanation|burst|cone|line)", r"@Template[type:\2|distance:\1]", string)
-    # string = sub(r"(\d+)-foot (emanation|burst|cone|line)", r"<span data-pf2-effect-area='\2' data-pf2-distance='\1' data-pf2-traits=''>\1-foot \2</span>", string)
+    string = sub(r"(\d+)-(foot|Foot) (emanation|burst|cone|line|Emanation|Burst|Cone|Line)", r"@Template[type:\3|distance:\1]", string)
+    string = sub(r"type:%s" % r"(Emanation|Burst|Cone|Line)", convert_to_lower, string)
+    
     return string
 
 def handle_third_party(string):
@@ -255,6 +256,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = string.replace(" <p>","</p><p>")
     string = string.replace(" </p>", "</p>")
     string = string.replace(";</p>","</p>")
+    string = string.replace("<p> ","<p>")
     
             
     if add_gm_text:
@@ -282,7 +284,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 
 
 
-# root.title("PF2e on Foundry VTT Data Entry v 2.1")
+# root.title("PF2e on Foundry VTT Data Entry v 2.2")
 
 # canvas = Canvas(root, height = Height, width = Width)
 # canvas.pack()
@@ -296,34 +298,34 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 # outputText = Text(frame, bg = 'white')
 # outputText.place(relx = 0.51, rely = 0.2, relwidth = 0.49, relheight = 0.8)
 
-## Settings
-###############################################################################
+# ## Settings
+# ###############################################################################
 # third_party = BooleanVar()
 # companion = BooleanVar()
 # eidolon = BooleanVar()
 # ancestry = BooleanVar()
 # use_clipboard = BooleanVar(value = True)
-# add_gm_text = BooleanVar(value = True)
+# add_gm_text = BooleanVar(value = False)
 # inline_rolls = BooleanVar(value = True)
 # add_conditions = BooleanVar(value = True)
 # add_inline_checks = BooleanVar(value = True)
 # add_inline_templates = BooleanVar(value = True)
 # remove_non_ASCII = BooleanVar(value = True)
 
-# handleThirdParty = Checkbutton(text = "Support Third Party", variable = third_party)
-# handleThirdParty.place(relx = 0.3, rely= 0)
+# # handleThirdParty = Checkbutton(text = "Support Third Party", variable = third_party)
+# # handleThirdParty.place(relx = 0.3, rely= 0)
 
-# handleCompanion = Checkbutton(text = "Animal Companion", variable = companion)
-# handleCompanion.place(relx = 0.3, rely= 0.05)
+# # handleCompanion = Checkbutton(text = "Animal Companion", variable = companion)
+# # handleCompanion.place(relx = 0.3, rely= 0.05)
 
-# handleEidolon = Checkbutton(text = "Eidolon", variable = eidolon)
-# handleEidolon.place(relx = 0.3, rely= 0.1)
+# # handleEidolon = Checkbutton(text = "Eidolon", variable = eidolon)
+# # handleEidolon.place(relx = 0.3, rely= 0.1)
 
-# handleAncestry = Checkbutton(text = "Ancestry", variable = ancestry)
-# handleAncestry.place(relx = 0.5, rely= 0.0)
+# # handleAncestry = Checkbutton(text = "Ancestry", variable = ancestry)
+# # handleAncestry.place(relx = 0.5, rely= 0.0)
 
-# useClipboard = Checkbutton(text = "Copy Output to Clipboard", variable = use_clipboard)
-# useClipboard.place(relx = 0.5, rely= 0.05)
+# # useClipboard = Checkbutton(text = "Copy Output to Clipboard", variable = use_clipboard)
+# # useClipboard.place(relx = 0.5, rely= 0.05)
 ###############################################################################
 
 
@@ -349,7 +351,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 # root.config(menu = menu)
 
 
-# ###############################################################################
+###############################################################################
 
 # reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), add_conditions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get()))
 # reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
@@ -359,7 +361,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 
 
 def main():
-    reformat(input(), third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True)
+    reformat(input(), third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = False, inline_rolls = True, add_conditions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True)
     # root.mainloop()
 
 
