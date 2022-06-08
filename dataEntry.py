@@ -1,9 +1,45 @@
 from regex import sub
 from pyperclip import copy
-# from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu
+from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu
 
-from constants import *
+## As nice as it is to have these declared separately for some reason different IDEs react poorly to them being * imported.
+DC = r"DC (\d+)"
 
+ABILITY_SCORES = r"(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)"
+SAVES = r"(Reflex|Will|Fortitude)"
+SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
+         r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
+
+CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
+
+ACTIONS = ["Avoid Notice", "Balance", "Burrow", "Cast a Spell", "Climb", "Coerce", "Crawl",
+           "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
+           "Force Open", "Grab an Edge", "Grapple", "High Jump", "Leap", "Liberating Step", "Long Jump",
+           "Make an Impression", "Mount", "Perform", "Search", "Seek", "Sense Motive", "Shove", "Sneak",
+           "Steal", "Sustain a Spell", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds",
+           "Trip", "Tumble Through"]
+
+CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Invisible",
+              "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed",
+              "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed"]
+NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened",
+                       "Stunned", "Stupefied", "Quickened"]
+
+EQUIPMENT = ["Handwraps of Mighty Blows"]
+
+FEATS = ["Canny Acumen", "Quick Jump"]
+
+SPELLS = []#"Dimension Door", "Plane Shift", "Stone Tell", "divine lance", "protection", "searing light", "divine wrath",
+          # "divine decree", "divine aura", "heroism", "chilling spray", "ray of frost", "cone of cold", "polar ray", 
+          # "heal", "water walk", "electric arc", "shocking grasp", "lightning bolt", "lightning storm", "chain lightning",
+          # "fireball", "chilling darkness", "produce flame", "burning hands", "flaming sphere", "wall of fire", "meteor swarm",
+          # "magic missile", "spiritual weapon", "spirtual guardian", "spirit song", "hypercognition", "daze", 
+          # "phantom pain", "warrior's regret", "phantasmal killer", "weird", "phantasmal calamity", "harm", "chill touch",
+          # "sudden blight", "enervation", "wail of the banshee", "puff of poison", "spider sting", "noxious vapors",
+          # "swarming wasp stings", "purple worm sting", "linnorm sting", "imp sting", "disrupt undead", "disrupting weapons",
+          # "breath of life", "regenerate", "true seeing", "feather fall", "jump", "mending", "illusory disguise", "charm",
+          # "fear", "share lore", "summon plant or fungus", "object reading", "enthrall", "bless", "mindblank", "invisibility",
+          # "endure elements", "knock", "earth bind", "fly", "augury"]
 
 def convert_to_lower(match_obj):
     if match_obj.group() is not None:
@@ -205,7 +241,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
         
     if remove_non_ASCII:
-        string = string.replace("–", "-").replace("’", "'")
+        string = string.replace("–", "-").replace("’", "'").replace("—","-")
     
     string = sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
@@ -264,53 +300,61 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         string = string.replace("<p><strong>Requirements</strong>", "<p data-visibility='gm'><strong>Requirements</strong>")
         string = string.replace("<p><strong>Frequency</strong>", "<p data-visibility='gm'><strong>Frequency</strong>")
 
-    print("\n")
-    print(string)
+    # print("\n")
+    # print(string)
 
     if use_clipboard:
         copy(string)
 
-    return string
-    # outputText.delete("1.0", END)
-    # outputText.insert(END, string)
+    # return string
+    outputText.delete("1.0", END)
+    outputText.insert(END, string)
     
-# def clearInput():
-#     inputText.delete("1.0", END)
+    
+###############################################################################
+# If you want to run the console version of this instead of the GUI comment out
+# the outputText lines above and uncomment `return string`. Then comment out 
+# everything below up to `def main()` then comment out `root.mainloop()` and 
+# uncomment `reformat(...)`.
+#
+# Build with `pyinstaller --noconsole --icon="D20_icon.ico" --onefile dataEntry.py`
+###############################################################################
 
-# Height = 700
-# Width = 800
+def clearInput():
+    inputText.delete("1.0", END)
 
-# root = Tk()
+Height = 700
+Width = 800
 
+root = Tk()
 
+root.title("PF2e on Foundry VTT Data Entry v 2.3")
 
-# root.title("PF2e on Foundry VTT Data Entry v 2.2")
+canvas = Canvas(root, height = Height, width = Width)
+canvas.pack()
 
-# canvas = Canvas(root, height = Height, width = Width)
-# canvas.pack()
+frame = Frame(root, bg = '#80c0ff')
+frame.place(relwidth = 1, relheight = 1)
 
-# frame = Frame(root, bg = '#80c0ff')
-# frame.place(relwidth = 1, relheight = 1)
+inputText = Text(frame, bg = 'white')
+inputText.place(rely = 0.2, relwidth = 0.49, relheight = 0.8)
 
-# inputText = Text(frame, bg = 'white')
-# inputText.place(rely = 0.2, relwidth = 0.49, relheight = 0.8)
+outputText = Text(frame, bg = 'white')
+outputText.place(relx = 0.51, rely = 0.2, relwidth = 0.49, relheight = 0.8)
 
-# outputText = Text(frame, bg = 'white')
-# outputText.place(relx = 0.51, rely = 0.2, relwidth = 0.49, relheight = 0.8)
-
-# ## Settings
-# ###############################################################################
-# third_party = BooleanVar()
-# companion = BooleanVar()
-# eidolon = BooleanVar()
-# ancestry = BooleanVar()
-# use_clipboard = BooleanVar(value = True)
-# add_gm_text = BooleanVar(value = False)
-# inline_rolls = BooleanVar(value = True)
-# add_conditions = BooleanVar(value = True)
-# add_inline_checks = BooleanVar(value = True)
-# add_inline_templates = BooleanVar(value = True)
-# remove_non_ASCII = BooleanVar(value = True)
+## Settings
+###############################################################################
+third_party = BooleanVar()
+companion = BooleanVar()
+eidolon = BooleanVar()
+ancestry = BooleanVar()
+use_clipboard = BooleanVar(value = True)
+add_gm_text = BooleanVar(value = False)
+inline_rolls = BooleanVar(value = True)
+add_conditions = BooleanVar(value = True)
+add_inline_checks = BooleanVar(value = True)
+add_inline_templates = BooleanVar(value = True)
+remove_non_ASCII = BooleanVar(value = True)
 
 # # handleThirdParty = Checkbutton(text = "Support Third Party", variable = third_party)
 # # handleThirdParty.place(relx = 0.3, rely= 0)
@@ -329,40 +373,38 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 ###############################################################################
 
 
-## Build settings menu
-###############################################################################
+# Build settings menu
+##############################################################################
 
-# menu = Menu(root)
+menu = Menu(root)
 
-# settings_menu = Menu(menu)
-# settings_menu.add_checkbutton(label = "Copy Output to Clipboard", variable = use_clipboard)
-# settings_menu.add_checkbutton(label = "Add GM Only Tags", variable = add_gm_text)
-# settings_menu.add_checkbutton(label = "Handle Inline rolls", variable = inline_rolls)
-# settings_menu.add_checkbutton(label = "Add Inline Templates", variable = add_inline_templates)
-# settings_menu.add_checkbutton(label = "Add Inline Checks", variable = add_inline_checks)
-# settings_menu.add_checkbutton(label = "Add Condition Links", variable = add_conditions)
-# settings_menu.add_checkbutton(label = "Remove non-ASCII characters", variable = remove_non_ASCII)
-# settings_menu.add_checkbutton(label = "Handle Animal Companion Blocks", variable = companion)
-# settings_menu.add_checkbutton(label = "Handle Eidolon Blocks", variable = eidolon)
-# settings_menu.add_checkbutton(label = "Handle Ancestry Description Text", variable = ancestry)
-# settings_menu.add_checkbutton(label = "Handle Third Party Formatting", variable = third_party)
+settings_menu = Menu(menu)
+settings_menu.add_checkbutton(label = "Copy Output to Clipboard", variable = use_clipboard)
+settings_menu.add_checkbutton(label = "Add GM Only Tags", variable = add_gm_text)
+settings_menu.add_checkbutton(label = "Handle Inline rolls", variable = inline_rolls)
+settings_menu.add_checkbutton(label = "Add Inline Templates", variable = add_inline_templates)
+settings_menu.add_checkbutton(label = "Add Inline Checks", variable = add_inline_checks)
+settings_menu.add_checkbutton(label = "Add Condition Links", variable = add_conditions)
+settings_menu.add_checkbutton(label = "Remove non-ASCII characters", variable = remove_non_ASCII)
+settings_menu.add_checkbutton(label = "Handle Animal Companion Blocks", variable = companion)
+settings_menu.add_checkbutton(label = "Handle Eidolon Blocks", variable = eidolon)
+settings_menu.add_checkbutton(label = "Handle Ancestry Description Text", variable = ancestry)
+settings_menu.add_checkbutton(label = "Handle Third Party Formatting", variable = third_party)
 
-# menu.add_cascade(label = "Settings", menu = settings_menu)
-# root.config(menu = menu)
+menu.add_cascade(label = "Settings", menu = settings_menu)
+root.config(menu = menu)
 
+##############################################################################
 
-###############################################################################
+reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), add_conditions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get()))
+reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
 
-# reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), add_conditions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get()))
-# reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
-
-# resetButton = Button(root, text="Clear Input", command = lambda: clearInput())
-# resetButton.place(relx = 0, rely= 0, relwidth = 0.25, relheight = 0.2)
-
+resetButton = Button(root, text="Clear Input", command = lambda: clearInput())
+resetButton.place(relx = 0, rely= 0, relwidth = 0.25, relheight = 0.2)
 
 def main():
-    reformat(input(), third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = False, inline_rolls = True, add_conditions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True)
-    # root.mainloop()
+    # reformat(input(), third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = False, inline_rolls = True, add_conditions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True)
+    root.mainloop()
 
 
 if __name__ == "__main__":
