@@ -12,22 +12,23 @@ SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|
 
 CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
 
-ACTIONS = ["Avoid Notice", "Balance", "Burrow", "Cast a Spell", "Climb", "Coerce", "Crawl",
+ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
            "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
            "Force Open", "Grab an Edge", "Grapple", "High Jump", "Leap", "Liberating Step", "Long Jump",
            "Make an Impression", "Mount", "Perform", "Search", "Seek", "Sense Motive", "Shove", "Sneak",
-           "Steal", "Sustain a Spell", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds",
+           "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds",
            "Trip", "Tumble Through"]
 
 CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Invisible",
               "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed",
               "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed"]
+
 NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened",
                        "Stunned", "Stupefied", "Quickened"]
 
-EQUIPMENT = ["Handwraps of Mighty Blows"]
+EQUIPMENT = []#"Handwraps of Mighty Blows"]
 
-FEATS = ["Canny Acumen", "Quick Jump"]
+FEATS = []#"Canny Acumen", "Quick Jump"]
 
 SPELLS = []#"Dimension Door", "Plane Shift", "Stone Tell", "divine lance", "protection", "searing light", "divine wrath",
           # "divine decree", "divine aura", "heroism", "chilling spray", "ray of frost", "cone of cold", "polar ray", 
@@ -86,7 +87,7 @@ def handle_conditions(string):
     string = sub(r"flat footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count=1)
 
     for condition in NUMBERED_CONDITIONS:
-        for i in range(1, 4):
+        for i in range(1, 6):
             string = condition_sub_with_stage(string, condition, i)
     return string
 
@@ -152,11 +153,13 @@ def handle_templates(string):
     
     return string
 
+
 def handle_third_party(string):
     # Handling for 3rd party formatting.
     string = sub(r"» (Critical Success|Success|Failure|Critical Failure)", r"</p><p><strong>\1</strong>", string)
     string = sub(r"»", r"•", string)
     return string
+
 
 def handle_background(string):
     string = sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
@@ -165,9 +168,11 @@ def handle_background(string):
     string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
     return string
 
+
 def handle_aura(string):
     string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
     return string
+
 
 def companion_format(string):
     string = sub(r"Size (Tiny|Small|Medium|Large)", r"<p><strong>Size</strong> \1</p>", string)
@@ -177,14 +182,14 @@ def companion_format(string):
     string = sub(r"(Dex|Con|Int|Wis|Cha) ", r"<strong>\1</strong> ", string)
     string = sub(r"Hit Points (\d+)", r"</p><p><strong>Hit Points</strong> \1</p>", string)
     string = sub(r"(Skill|Senses|Speed|Support Benefit|Advanced Maneuver)", r"</p><p><strong>\1</strong>", string)
-    
     return string
+
 
 def eidolon_format(string):
     string = sub(r"(Tradition|Traits|Alignment|Home Plane|Size|Suggested Attacks|Skills|Senses|Language|Speed|Eidolon Abilities)", r"</p><p><strong>\1</strong>", string)
     string = sub(r"(\w+) (\w+) Str (\d+), Dex (\d+), Con (\d+), Int (\d+), Wis (\d+), Cha (\d+); \+(\d+) AC \(\+(\d+) Dex cap\)", r"</p><p><strong>\1 \2</strong> Str \3, Dex \4, Con \5, Int \6, Wis \7, Cha \8; +\9 AC (+\10 Dex cap)", string)
-    
     return string
+
 
 def handle_inlines_checks(string):
     
@@ -206,24 +211,28 @@ def handle_inlines_checks(string):
     # Catch capitalized saves
     string = sub(r"type:%s" % SAVES, convert_to_lower, string)
     string = sub(r"type:%s" % SKILLS, convert_to_lower, string)
-    
     return string
 
+
 def ancestry_format(string):
-    string = sub(r"YOU MIGHT...",r"</p><h2>You Might...</h2>", string)
-    string = sub(r"OTHERS PROBABLY...",r"</ul><h2>Others Probably...</h2><ul>", string)
-    string = sub(r"PHYSICAL DESCRIPTION",r"</ul><h2>Physical Description</h2><p>", string)
-    string = sub(r"SOCIETY",r"</p><h2>Society</h2><p>", string)
-    string = sub(r"ALIGNMENT AND RELIGION",r"</p><h2>Alignment and religion</h2><p>", string)
-    string = sub(r"NAMES",r"</p><h2>Names</h2><p>", string)
-    string = sub(r"S ample N ameS",r"</p><h3>Sample Names</h3><p>", string)
-    
+    string = sub(r"YOU MIGHT...", r"</p><h2>You Might...</h2>", string)
+    string = sub(r"OTHERS PROBABLY...", r"</ul><h2>Others Probably...</h2><ul>", string)
+    string = sub(r"PHYSICAL DESCRIPTION", r"</ul><h2>Physical Description</h2><p>", string)
+    string = sub(r"SOCIETY", r"</p><h2>Society</h2><p>", string)
+    string = sub(r"ALIGNMENT AND RELIGION", r"</p><h2>Alignment and religion</h2><p>", string)
+    string = sub(r"NAMES", r"</p><h2>Names</h2><p>", string)
+    string = sub(r"S ample N ameS", r"</p><h3>Sample Names</h3><p>", string)
     return string
+
+
+def handle_areas(string):
+    string = sub(r" ([A-Z][0-9]{1,3})", r" <strong>\1</strong>", string)
+    return string
+
 
 def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True):
     # Initial handling not using regex.
     string = "<p>" + text.replace("Trigger", "<p><strong>Trigger</strong>")\
-        .replace("Requirements", "<p><strong>Requirements</strong>")\
         .replace("\nCritical Success", "</p><hr /><p><strong>Critical Success</strong>")\
         .replace("\nSuccess", "</p><p><strong>Success</strong>")\
         .replace("\nFailure", "</p><p><strong>Failure</strong>")\
@@ -231,7 +240,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         .replace("\nSpecial", "</p><p><strong>Special</strong>")\
         .replace("\n", " ")\
         .replace("Frequency", "<p><strong>Frequency</strong>")\
-        .replace("Effect", "</p><p><strong>Effect</strong>")\
+        .replace("Effect", "</p><hr /><p><strong>Effect</strong>")\
         .replace("Cost", "<strong>Cost</strong>") + "</p>"
     string = string.replace("<p><p>", "<p>")\
         .replace(r"”", r"\"")\
@@ -242,6 +251,8 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         
     if remove_non_ASCII:
         string = string.replace("–", "-").replace("’", "'").replace("—","-")
+    
+    string = sub(r"(Requirements|Requirement)", r"<p><strong>Requirements</strong>", string)
     
     string = sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
@@ -283,6 +294,8 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     
     string = handle_activation_actions(string)
     string = handle_aura(string)
+    
+    string = handle_areas(string)
     
 
     if "Choose two ability boosts" in string:
@@ -328,7 +341,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.3")
+root.title("PF2e on Foundry VTT Data Entry v 2.4")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
