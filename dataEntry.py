@@ -10,7 +10,7 @@ SAVES = r"(Reflex|Will|Fortitude)"
 SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
          r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
 
-CONDITION_COMPENDIUM = r"@UUID[Compendium.pf2e.conditionitems."
+CONDITION_COMPENDIUM = r"@Compendium.pf2e.conditionitems."
 
 ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
            "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
@@ -48,7 +48,7 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
-    return sub(r"\b" + action + r"\b", r"@UUID[Compendium.pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+    return sub(r"\b" + action + r"\b", r"@Compendium.pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
 
 
 def condition_sub(string, condition):
@@ -62,15 +62,15 @@ def condition_sub_with_stage(string, condition, stage):
 
 
 def equipment_sub(string, equipment):
-    return sub(equipment, r"@UUID[Compendium.pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
+    return sub(equipment, r"@Compendium.pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
 
 
 def feat_sub(string, feat):
-    return sub(feat, r"@UUID[Compendium.pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
+    return sub(feat, r"@Compendium.pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
 
 
 def spell_sub(string, spell):
-    return sub(spell, r"<em>@UUID[Compendium.pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
+    return sub(spell, r"<em>@Compendium.pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
 
 
 def handle_actions(string):
@@ -146,6 +146,7 @@ def handle_bullet_lists(string):
     string = sub(r"•", "</li><li>", string)
     return string
 
+
 def handle_templates(string):
     # Add template buttons
     string = sub(r"(\d+)-(foot|Foot) (emanation|burst|cone|line|Emanation|Burst|Cone|Line)", r"@Template[type:\3|distance:\1]", string)
@@ -165,12 +166,12 @@ def handle_background(string):
     string = sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
     string = sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
     string = sub(r"You're trained in", r"</p><p>You're trained in", string)
-    string = sub(r"You gain the (.*) skill feat",r"You gain the @UUID[Compendium.pf2e.feats-srd.\1]{\1} skill feat",string)
+    string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium.pf2e.feats-srd.\1]{\1} skill feat",string)
     return string
 
 
 def handle_aura(string):
-    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @UUID[Compendium.pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
+    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium.pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
     return string
 
 
@@ -192,7 +193,6 @@ def eidolon_format(string):
 
 
 def handle_inlines_checks(string):
-    
     # Skills and saves
     string = sub(r"%s basic (\w+) save" % DC, r"@Check[type:\2|dc:\1|basic:true]", string)
     string = sub(r"%s %s" % (DC, SAVES), r"@Check[type:\2|dc:\1]", string)
@@ -213,10 +213,12 @@ def handle_inlines_checks(string):
     string = sub(r"type:%s" % SKILLS, convert_to_lower, string)
     return string
 
+
 def handle_counteract(string):
     string = sub(r"counteract modifier of \+(\d+)", r"counteract modifier of [[/r 1d20+\1 #Counteract]]{+\1}", string)
     string = sub(r"\+(\d+) counteract modifier", r"[[/r 1d20+\1 #Counteract]]{+\1} counteract modifier", string)
     return string
+
 
 def ancestry_format(string):
     string = sub(r"YOU MIGHT...", r"</p><h2>You Might...</h2>", string)
@@ -233,9 +235,11 @@ def handle_areas(string):
     string = sub(r" ([A-Z][0-9]{1,3})", r" <strong>\1</strong>", string)
     return string
 
+
 def handle_innate_spell_links(string):
-    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@UUID[Compendium.pf2e.spells.\1]{\1} \2 innate", string)
+    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium.pf2e.spells.\1]{\1} \2 innate", string)
     return string
+
 
 def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True):
     # Initial handling not using regex.
@@ -250,8 +254,8 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         .replace("Effect", "</p><hr /><p><strong>Effect</strong>")\
         .replace("Cost", "<strong>Cost</strong>") + "</p>"
     string = string.replace("<p><p>", "<p>")\
-        .replace(r"”", r"\"")\
-        .replace(r"“", r"\"")\
+        .replace(r"”", r'"')\
+        .replace(r"“", r'"')\
         .replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
         .replace("Onset", "</p><p><strong>Onset</strong>")\
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
@@ -318,7 +322,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = string.replace("<p> ","<p>")
     
     # Sneak attack features have different text requirements so we undo some of the changes made
-    string = sub(r"deals an additional \[\[/r {(\d)d(\d)}\[precision\]\]\]{(\d)d(\d) precision damage} to @UUID\[Compendium.pf2e.conditionitems.Flat-Footed\]{Flat-Footed} creatures.", r"deals an additional \1d\2 precision damage to flat-footed creatures.", string)
+    string = sub(r"deals an additional \[\[/r {(\d)d(\d)}\[precision\]\]\]{(\d)d(\d) precision damage} to @Compendium\[pf2e.conditionitems.Flat-Footed\]{Flat-Footed} creatures.", r"deals an additional \1d\2 precision damage to flat-footed creatures.", string)
     
             
     if add_gm_text:
@@ -354,7 +358,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.5")
+root.title("PF2e on Foundry VTT Data Entry v 2.5.1")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
