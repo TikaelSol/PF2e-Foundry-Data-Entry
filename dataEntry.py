@@ -1,3 +1,4 @@
+import regex as re
 from regex import sub
 from pyperclip import copy
 from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu
@@ -10,7 +11,7 @@ SAVES = r"(Reflex|Will|Fortitude)"
 SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
          r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
 
-CONDITION_COMPENDIUM = r"@Compendium.pf2e.conditionitems."
+CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
 
 ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
            "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
@@ -48,7 +49,7 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
-    return sub(r"\b" + action + r"\b", r"@Compendium.pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+    return sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
 
 
 def condition_sub(string, condition):
@@ -62,15 +63,15 @@ def condition_sub_with_stage(string, condition, stage):
 
 
 def equipment_sub(string, equipment):
-    return sub(equipment, r"@Compendium.pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
+    return sub(equipment, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
 
 
 def feat_sub(string, feat):
-    return sub(feat, r"@Compendium.pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
+    return sub(feat, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
 
 
 def spell_sub(string, spell):
-    return sub(spell, r"<em>@Compendium.pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
+    return sub(spell, r"<em>@Compendium[pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
 
 
 def handle_actions(string):
@@ -166,12 +167,12 @@ def handle_background(string):
     string = sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
     string = sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
     string = sub(r"You're trained in", r"</p><p>You're trained in", string)
-    string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium.pf2e.feats-srd.\1]{\1} skill feat",string)
+    string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
     return string
 
 
 def handle_aura(string):
-    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium.pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
+    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
     return string
 
 
@@ -221,13 +222,13 @@ def handle_counteract(string):
 
 
 def ancestry_format(string):
-    string = sub(r"YOU MIGHT...", r"</p><h2>You Might...</h2>", string)
-    string = sub(r"OTHERS PROBABLY...", r"</ul><h2>Others Probably...</h2><ul>", string)
-    string = sub(r"PHYSICAL DESCRIPTION", r"</ul><h2>Physical Description</h2><p>", string)
-    string = sub(r"SOCIETY", r"</p><h2>Society</h2><p>", string)
-    string = sub(r"ALIGNMENT AND RELIGION", r"</p><h2>Alignment and religion</h2><p>", string)
+    string = sub(r"(?i)Y\s*O\s*U M\s*I\s*G\s*H\s*T\s*...", r"</p><h2>You Might...</h2>", string)
+    string = sub(r"O\s*T\s*H\s*E\s*R\s*S P\s*R\s*O\s*B\s*A\s*B\s*L\s*Y\s*...", r"</ul><h2>Others Probably...</h2><ul>", string, flags=re.IGNORECASE)
+    string = sub(r"(?i)P\s*H\s*Y\s*S\s*I\s*C\s*A\s*L D\s*E\s*S\s*C\s*R\s*I\s*P\s*T\s*I\s*O\s*N", r"</ul><h2>Physical Description</h2><p>", string)
+    string = sub(r"(?i)S\s*O\s*C\s*I\s*E\s*T\s*Y", r"</p><h2>Society</h2><p>", string)
+    string = sub(r"(?i)A\s*L\s*I\s*G\s*N\s*M\s*E\s*N\s*T A\s*N\s*D R\s*E\s*L\s*I\s*G\s*I\s*O\s*N", r"</p><h2>Alignment and religion</h2><p>", string)
     string = sub(r"NAMES", r"</p><h2>Names</h2><p>", string)
-    string = sub(r"S ample N ameS", r"</p><h3>Sample Names</h3><p>", string)
+    string = sub(r"(?i)S\s*a\s*m\s*p\s*l\s*e N\s*a\s*m\s*e\s*S", r"</p><h3>Sample Names</h3><p>", string)
     return string
 
 
@@ -237,7 +238,7 @@ def handle_areas(string):
 
 
 def handle_innate_spell_links(string):
-    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium.pf2e.spells.\1]{\1} \2 innate", string)
+    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium[pf2e.spells-srd.\1]{\1}</em> \2 innate", string)
     return string
 
 
@@ -303,7 +304,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = handle_equipment(string)
     string = handle_feats(string)
     string = handle_spells(string)
-    string = handle_innate_spell_links(string)
+    # string = handle_innate_spell_links(string)
     string = handle_counteract(string)
     
     string = handle_activation_actions(string)
@@ -358,7 +359,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.5.1")
+root.title("PF2e on Foundry VTT Data Entry v 2.5.2")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
