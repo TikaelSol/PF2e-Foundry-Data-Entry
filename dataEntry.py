@@ -198,6 +198,8 @@ def eidolon_format(string):
 def handle_inlines_checks(string):
     # Skills and saves
     string = sub(r"%s basic (\w+) save" % DC, r"@Check[type:\2|dc:\1|basic:true]", string)
+    string = sub(r"basic (\w+) save %s" % DC, r"@Check[type:\1|dc:\2|basic:true]", string)
+    string = sub(r"basic (\w+) %s" % DC, r"@Check[type:\1|dc:\2|basic:true]", string)
     string = sub(r"%s %s" % (DC, SAVES), r"@Check[type:\2|dc:\1]", string)
     string = sub(r"%s %s" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
     string = sub(r"%s \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
@@ -371,7 +373,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.6")
+root.title("PF2e on Foundry VTT Data Entry v 2.7")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
