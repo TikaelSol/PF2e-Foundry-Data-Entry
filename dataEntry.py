@@ -27,7 +27,7 @@ CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafen
 NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened",
                        "Stunned", "Stupefied", "Quickened"]
 
-BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Pathfinder Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault"]
+BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault"]
 
 EQUIPMENT = []#"Handwraps of Mighty Blows"]
 
@@ -123,11 +123,11 @@ def handle_activation_actions(string):
 
 
 def handle_damage_rolls(string):
-    string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/r \1d\2 #\3]]{\1d\2 \3}", string)
+    string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/br \1d\2 #\3]]{\1d\2 \3}", string)
     string = sub(r" (\d+) (\w*) damage", r" [[/r \1[\2]]]", string)
-    string = sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r (\1d\2+\3)[\4]]]", string)
-    string = sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r \1d\2[persistent,\3]]]", string)
-    string = sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r \1d\2[\3]]]", string)
+    string = sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r (\1d\2+\3)[\4]]] damage", string)
+    string = sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r \1d\2[persistent,\3]]] damage", string)
+    string = sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r \1d\2[\3]]] damage", string)
     string = sub(r"(\d+)d(\d+) (\w+)(\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
     string = sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]].", string)
     return string
@@ -281,6 +281,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
 
     string = sub("Access", "<p><strong>Access</strong>", string, count=1)
     string = sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
+    string = sub(r"Activate (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate</strong> \1 \2", string)
 
     if third_party:
         string = handle_third_party(string)
@@ -372,7 +373,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.8")
+root.title("PF2e on Foundry VTT Data Entry v 2.9")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
