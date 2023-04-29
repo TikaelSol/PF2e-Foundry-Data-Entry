@@ -123,7 +123,6 @@ def handle_activation_actions(string):
 
 
 def handle_damage_rolls(string):
-    string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/br \1d\2 #\3]]{\1d\2 \3}", string)
     string = sub(r" (\d+) (\w*) damage", r" [[/r \1[\2]]]", string)
     string = sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r (\1d\2+\3)[\4]]] damage", string)
     string = sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r \1d\2[persistent,\3]]] damage", string)
@@ -195,20 +194,20 @@ def eidolon_format(string):
 
 def handle_inlines_checks(string):
     # Skills and saves
-    string = sub(r"%s basic (\w+) save" % DC, r"@Check[type:\2|dc:\1|basic:true]", string)
-    string = sub(r"basic (\w+) save %s" % DC, r"@Check[type:\1|dc:\2|basic:true]", string)
+    string = sub(r"%s basic (\w+) save" % DC, r"@Check[type:\2|dc:\1|basic:true] save", string)
+    string = sub(r"basic (\w+) save %s" % DC, r"@Check[type:\1|dc:\2|basic:true] save", string)
     string = sub(r"basic (\w+) %s" % DC, r"@Check[type:\1|dc:\2|basic:true]", string)
     string = sub(r"%s %s" % (DC, SAVES), r"@Check[type:\2|dc:\1]", string)
     string = sub(r"%s %s" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
     string = sub(r"%s \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
-    string = sub(r"%s save \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
+    string = sub(r"%s save \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2] save", string)
 
     string = sub(r"%s %s" % (DC, SKILLS), r"@Check[type:\2|dc:\1]", string)
     string = sub(r"%s %s" % (SKILLS, DC), r"@Check[type:\1|dc:\2]", string)
     string = sub(r"%s \(%s\)" % (SKILLS, DC), r"@Check[type:\1|dc:\2", string)
 
-    string = sub(r"(\w+) Lore %s" % DC, r"@Check[type:\2|dc:\1]", string)
-    string = sub(r"%s (\w+) save" % DC, r"@Check[type:\2|dc:\1]", string)
+    string = sub(r"(\w+) Lore %s" % DC, r"@Check[type:\2-lore|dc:\1]{\1 Lore}", string)
+    string = sub(r"%s (\w+) save" % DC, r"@Check[type:\2|dc:\1] save", string)
     string = sub(r"%s flat check" % DC, r"@Check[type:flat|dc:\1]", string)
 
     # Catch capitalized saves
@@ -243,12 +242,20 @@ def handle_innate_spell_links(string):
     string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium[pf2e.spells-srd.\1]{\1}</em> \2 innate", string)
     return string
 
+
 def remove_books(string):
-    
     for book in BOOK_TITLES:
         string = sub(r" \((Pathfinder |)%s (\d+)\)" % book, r"", string)
     
     string = sub(r" \(page (\d+)\)", r"", string)
+    
+    return string
+
+
+def format_monster_parts(string):
+    string = string.replace("Monster Parts", "<p><strong>Monster Parts</strong>")\
+        .replace("Eligible Refinements", "</p><p><strong>Eligible Refinements</strong>")\
+        .replace("Eligible Imbued Properties", "</p><p><strong>Eligible Imbued Properties</strong>")
     
     return string
 
@@ -282,6 +289,9 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub("Access", "<p><strong>Access</strong>", string, count=1)
     string = sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
     string = sub(r"Activate (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate</strong> \1 \2", string)
+    
+    string = sub(r"can't use (.*?) again for (\d)d(\d) rounds.", r"can't use \1 again for [[/br \2d\3 #\1 Recharge]]{\2d\3 rounds}", string)
+    string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/br \1d\2 #\3]]{\1d\2 \3}", string)
 
     if third_party:
         string = handle_third_party(string)
@@ -313,6 +323,9 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     if add_actions:
         string = handle_actions(string)
     
+    if monster_parts:
+        string = format_monster_parts(string)
+    
     string = handle_equipment(string)
     string = handle_feats(string)
     string = handle_spells(string)
@@ -324,8 +337,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     
     string = handle_areas(string)
     
-    string = remove_books(string)
-    
+    string = remove_books(string)    
 
     if "Choose two ability boosts" in string:
         string = handle_background(string)
@@ -373,7 +385,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.9")
+root.title("PF2e on Foundry VTT Data Entry v 2.10")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
@@ -390,6 +402,7 @@ outputText.place(relx = 0.51, rely = 0.2, relwidth = 0.49, relheight = 0.8)
 ## Settings
 ###############################################################################
 third_party = BooleanVar()
+monster_parts = BooleanVar()
 companion = BooleanVar()
 eidolon = BooleanVar()
 ancestry = BooleanVar()
@@ -401,21 +414,6 @@ add_actions = BooleanVar(value = True)
 add_inline_checks = BooleanVar(value = True)
 add_inline_templates = BooleanVar(value = True)
 remove_non_ASCII = BooleanVar(value = True)
-
-# # handleThirdParty = Checkbutton(text = "Support Third Party", variable = third_party)
-# # handleThirdParty.place(relx = 0.3, rely= 0)
-
-# # handleCompanion = Checkbutton(text = "Animal Companion", variable = companion)
-# # handleCompanion.place(relx = 0.3, rely= 0.05)
-
-# # handleEidolon = Checkbutton(text = "Eidolon", variable = eidolon)
-# # handleEidolon.place(relx = 0.3, rely= 0.1)
-
-# # handleAncestry = Checkbutton(text = "Ancestry", variable = ancestry)
-# # handleAncestry.place(relx = 0.5, rely= 0.0)
-
-# # useClipboard = Checkbutton(text = "Copy Output to Clipboard", variable = use_clipboard)
-# # useClipboard.place(relx = 0.5, rely= 0.05)
 ###############################################################################
 
 
@@ -436,7 +434,8 @@ settings_menu.add_checkbutton(label = "Remove non-ASCII characters", variable = 
 settings_menu.add_checkbutton(label = "Handle Animal Companion Blocks", variable = companion)
 settings_menu.add_checkbutton(label = "Handle Eidolon Blocks", variable = eidolon)
 settings_menu.add_checkbutton(label = "Handle Ancestry Description Text", variable = ancestry)
-settings_menu.add_checkbutton(label = "Handle Third Party Formatting", variable = third_party)
+settings_menu.add_checkbutton(label = "Handle Third Party Formatting (legacy)", variable = third_party)
+settings_menu.add_checkbutton(label = "Handle Monster Part Formatting (third party)", variable = monster_parts)
 
 menu.add_cascade(label = "Settings", menu = settings_menu)
 root.config(menu = menu)
