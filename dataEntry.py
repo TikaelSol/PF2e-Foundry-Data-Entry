@@ -290,7 +290,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
     string = sub(r"Activate (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate</strong> \1 \2", string)
     
-    string = sub(r"can't use (.*?) again for (\d)d(\d) rounds.", r"can't use \1 again for [[/br \2d\3 #\1 Recharge]]{\2d\3 rounds}", string)
+    string = sub(r"can't use (.*?) again for (\d)d(\d) rounds", r"can't use \1 again for [[/br \2d\3 #\1 Recharge]]{\2d\3 rounds}", string)
     string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/br \1d\2 #\3]]{\1d\2 \3}", string)
 
     if third_party:
