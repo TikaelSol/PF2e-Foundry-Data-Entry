@@ -123,7 +123,7 @@ def handle_activation_actions(string):
 
 
 def handle_damage_rolls(string):
-    string = sub(r" (\d+) (\w*) damage", r" [[/r \1[\2]]]", string)
+    string = sub(r" (\d+) (\w*) damage", r" [[/r \1[\2]]] damage", string)
     string = sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r (\1d\2+\3)[\4]]] damage", string)
     string = sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r \1d\2[persistent,\3]]] damage", string)
     string = sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r \1d\2[\3]]] damage", string)
@@ -256,12 +256,13 @@ def format_monster_parts(string):
     string = string.replace("Monster Parts", "<p><strong>Monster Parts</strong>")\
         .replace("Eligible Refinements", "</p><p><strong>Eligible Refinements</strong>")\
         .replace("Eligible Imbued Properties", "</p><p><strong>Eligible Imbued Properties</strong>")
-    
+
     return string
 
 def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True):
     # Initial handling not using regex.
     string = "<p>" + text.replace("Trigger", "<p><strong>Trigger</strong>")\
+        .replace(" "," ")\
         .replace("\nCritical Success", "</p><hr /><p><strong>Critical Success</strong>")\
         .replace("\nSuccess", "</p><p><strong>Success</strong>")\
         .replace("\nFailure", "</p><p><strong>Failure</strong>")\
@@ -333,7 +334,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = handle_counteract(string)
     
     string = handle_activation_actions(string)
-    string = handle_aura(string)
+    # string = handle_aura(string)
     
     string = handle_areas(string)
     
@@ -385,7 +386,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.10")
+root.title("PF2e on Foundry VTT Data Entry v 2.11")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
