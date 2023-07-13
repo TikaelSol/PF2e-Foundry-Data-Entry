@@ -11,7 +11,7 @@ SAVES = r"(Reflex|Will|Fortitude)"
 SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
          r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
 
-CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
+CONDITION_COMPENDIUM = r"@UUID[Compendium.pf2e.conditionitems.item."
 
 ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
            "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
@@ -51,7 +51,7 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
-    return sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+    return sub(r"\b" + action + r"\b", r"@UUID[Compendium.pf2e.actionspf2e.item.%s]{%s}" % (action, action), string, count=1)
 
 
 def condition_sub(string, condition):
@@ -65,15 +65,15 @@ def condition_sub_with_stage(string, condition, stage):
 
 
 def equipment_sub(string, equipment):
-    return sub(equipment, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
+    return sub(equipment, r"@UUID[Compendium.pf2e.equipment-srd.item.%s]{%s}" % (equipment, equipment), string, count=1)
 
 
 def feat_sub(string, feat):
-    return sub(feat, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
+    return sub(feat, r"@UUID[Compendium.pf2e.feats-srd.item.%s]{%s}" % (feat, feat), string, count=1)
 
 
 def spell_sub(string, spell):
-    return sub(spell, r"<em>@Compendium[pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
+    return sub(spell, r"<em>@UUID[Compendium.pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
 
 
 def handle_actions(string):
@@ -166,12 +166,12 @@ def handle_background(string):
     string = sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
     string = sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
     string = sub(r"You're trained in", r"</p><p>You're trained in", string)
-    string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
+    string = sub(r"You gain the (.*) skill feat",r"You gain the @UUID[Compendium.pf2e.feats-srd.item.\1]{\1} skill feat",string)
     return string
 
 
 def handle_aura(string):
-    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
+    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @UUID[Compendium.pf2e.bestiary-ability-glossary-srd.item.Aura]{Aura}</p><p>", string)
     return string
 
 
@@ -239,7 +239,7 @@ def handle_areas(string):
 
 
 def handle_innate_spell_links(string):
-    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium[pf2e.spells-srd.\1]{\1}</em> \2 innate", string)
+    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@UUID[Compendium.pf2e.spells-srd.item.\1]{\1}</em> \2 innate", string)
     return string
 
 
@@ -259,7 +259,7 @@ def format_monster_parts(string):
 
     return string
 
-def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True):
+def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False):
     # Initial handling not using regex.
     string = "<p>" + text.replace("Trigger", "<p><strong>Trigger</strong>")\
         .replace(" "," ")\
@@ -358,6 +358,11 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         string = string.replace("<p><strong>Requirements</strong>", "<p data-visibility='gm'><strong>Requirements</strong>")
         string = string.replace("<p><strong>Frequency</strong>", "<p data-visibility='gm'><strong>Frequency</strong>")
 
+    # This is for text replacement without the wrapping <p></p> tags around the entire block. Easiest to just strip them.
+    if replacement_mode:
+        string = string[3:]
+        string = string[:-4]
+
     # print("\n")
     # print(string)
 
@@ -386,7 +391,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.11")
+root.title("PF2e on Foundry VTT Data Entry v 2.12")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
@@ -402,11 +407,12 @@ outputText.place(relx = 0.51, rely = 0.2, relwidth = 0.49, relheight = 0.8)
 
 ## Settings
 ###############################################################################
-third_party = BooleanVar()
-monster_parts = BooleanVar()
-companion = BooleanVar()
-eidolon = BooleanVar()
-ancestry = BooleanVar()
+third_party = BooleanVar(value = False)
+monster_parts = BooleanVar(value = False)
+companion = BooleanVar(value = False)
+eidolon = BooleanVar(value = False)
+ancestry = BooleanVar(value = False)
+replacement_mode = BooleanVar(value = False)
 use_clipboard = BooleanVar(value = True)
 add_gm_text = BooleanVar(value = False)
 inline_rolls = BooleanVar(value = True)
@@ -432,6 +438,7 @@ settings_menu.add_checkbutton(label = "Add Inline Checks", variable = add_inline
 settings_menu.add_checkbutton(label = "Add Condition Links", variable = add_conditions)
 settings_menu.add_checkbutton(label = "Add Action Links", variable = add_actions)
 settings_menu.add_checkbutton(label = "Remove non-ASCII characters", variable = remove_non_ASCII)
+settings_menu.add_checkbutton(label = "No Wrapping <p> tags", variable = replacement_mode)
 settings_menu.add_checkbutton(label = "Handle Animal Companion Blocks", variable = companion)
 settings_menu.add_checkbutton(label = "Handle Eidolon Blocks", variable = eidolon)
 settings_menu.add_checkbutton(label = "Handle Ancestry Description Text", variable = ancestry)
@@ -443,7 +450,7 @@ root.config(menu = menu)
 
 ##############################################################################
 
-reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), add_conditions.get(), add_actions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get()))
+reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), add_conditions.get(), add_actions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get(), replacement_mode.get(), monster_parts.get()))
 reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
 
 resetButton = Button(root, text="Clear Input", command = lambda: clearInput())
