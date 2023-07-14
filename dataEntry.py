@@ -11,7 +11,7 @@ SAVES = r"(Reflex|Will|Fortitude)"
 SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
          r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
 
-CONDITION_COMPENDIUM = r"@Compendium.pf2e.conditionitems."
+CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
 
 ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
            "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
@@ -51,7 +51,7 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
-    return sub(r"\b" + action + r"\b", r"@Compendium.pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+    return sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
 
 
 def condition_sub(string, condition):
@@ -65,15 +65,15 @@ def condition_sub_with_stage(string, condition, stage):
 
 
 def equipment_sub(string, equipment):
-    return sub(equipment, r"@Compendium.pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
+    return sub(equipment, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
 
 
 def feat_sub(string, feat):
-    return sub(feat, r"@Compendium.pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
+    return sub(feat, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
 
 
 def spell_sub(string, spell):
-    return sub(spell, r"<em>@Compendium.pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
+    return sub(spell, r"<em>@Compendium[pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
 
 
 def handle_actions(string):
@@ -166,12 +166,12 @@ def handle_background(string):
     string = sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
     string = sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
     string = sub(r"You're trained in", r"</p><p>You're trained in", string)
-    string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium.pf2e.feats-srd.\1]{\1} skill feat",string)
+    string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
     return string
 
 
 def handle_aura(string):
-    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium.pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
+    string = sub(r"<p>(\d+) feet.",r"<p>@Template[type:emanation|distance:\1] @Compendium[pf2e.bestiary-ability-glossary-srd.Aura]{Aura}</p><p>", string)
     return string
 
 
@@ -239,7 +239,7 @@ def handle_areas(string):
 
 
 def handle_innate_spell_links(string):
-    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium.pf2e.spells-srd.\1]{\1}</em> \2 innate", string)
+    string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium[pf2e.spells-srd.\1]{\1}</em> \2 innate", string)
     return string
 
 
