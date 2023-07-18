@@ -114,11 +114,11 @@ def handle_spells(string):
 
 
 def handle_activation_actions(string):
-    string = sub(r"\[free-action\]", r"<span class=\"pf2-icon\">F</span>", string)
-    string = sub(r"\[reaction\]", r"<span class=\"pf2-icon\">R</span>", string)
-    string = sub(r"\[one-action\]", r"<span class=\"pf2-icon\">1</span>", string)
-    string = sub(r"\[two-actions\]", r"<span class=\"pf2-icon\">2</span>", string)
-    string = sub(r"\[three-actions\]", r"<span class=\"pf2-icon\">3</span>", string)
+    string = sub(r"\[free-action\]", r"<span class='pf2-icon'>F</span>", string)
+    string = sub(r"\[reaction\]", r"<span class='pf2-icon'>R</span>", string)
+    string = sub(r"\[one-action\]", r"<span class='pf2-icon'>1</span>", string)
+    string = sub(r"\[two-actions\]", r"<span class='pf2-icon'>2</span>", string)
+    string = sub(r"\[three-actions\]", r"<span class='pf2-icon'>3</span>", string)
     return string
 
 
@@ -391,7 +391,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.12")
+root.title("PF2e on Foundry VTT Data Entry v 2.13")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
