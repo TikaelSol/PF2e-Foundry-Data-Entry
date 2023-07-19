@@ -139,6 +139,13 @@ def handle_spell_heightening(string):
     string = sub(r"<hr /></p><p><strong>Heightened", r"</p><hr /><p><strong>Heightened", string)
     return string
 
+def handle_level_heightening(string):
+    string = sub(r"Level \(", r"<hr />Level (", string, count=1)
+    string = sub(r"Level \(\+(\d+)\)", r"</p><p><strong>Level (+\1)</strong>", string)
+    string = sub(r"Level \((\d+)(\w+)\)", r"</p><p><strong>Level (\1\2)</strong>", string)
+    string = sub(r"<hr /></p><p><strong>Level", r"</p><hr /><p><strong>Level", string)
+    return string
+
 
 def handle_bullet_lists(string):
     # Removing bullet points, should replace with the actual bullet points.
@@ -319,6 +326,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         string = handle_templates(string)
     
     string = handle_spell_heightening(string)
+    string = handle_level_heightening(string)
     string = handle_bullet_lists(string)
     
     if add_actions:
