@@ -216,6 +216,12 @@ def handle_inlines_checks(string):
     string = sub(r"(\w+) Lore %s" % DC, r"@Check[type:\2-lore|dc:\1]{\1 Lore}", string)
     string = sub(r"%s (\w+) save" % DC, r"@Check[type:\2|dc:\1] save", string)
     string = sub(r"%s flat check" % DC, r"@Check[type:flat|dc:\1]", string)
+    
+    string = sub(r"basic %s save against your class DC or spell DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classOrSpellDC.value)|basic:true] save against your class DC or spell DC", string)
+    string = sub(r"%s save against your class DC or spell DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classOrSpellDC.value)] save against your class DC or spell DC", string)
+    string = sub(r"basic %s save against your class DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classDC.value)|basic:true] save against your class DC", string)
+    string = sub(r"%s save against your class DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classDC.value)] save against your class DC", string)
+    
 
     # Catch capitalized saves
     string = sub(r"type:%s" % SAVES, convert_to_lower, string)
@@ -399,7 +405,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.13")
+root.title("PF2e on Foundry VTT Data Entry v 2.14")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
