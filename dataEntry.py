@@ -51,11 +51,11 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
-    return sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count=1)
+    return sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count = 1)
 
 
 def condition_sub(string, condition):
-    return sub(condition.lower(), r"%s%s]{%s}" % (CONDITION_COMPENDIUM, condition, condition), string, count=1)
+    return sub(condition.lower(), r"%s%s]{%s}" % (CONDITION_COMPENDIUM, condition, condition), string, count = 1)
 
 
 def condition_sub_with_stage(string, condition, stage):
@@ -65,15 +65,15 @@ def condition_sub_with_stage(string, condition, stage):
 
 
 def equipment_sub(string, equipment):
-    return sub(equipment, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count=1)
+    return sub(equipment, r"@Compendium[pf2e.equipment-srd.%s]{%s}" % (equipment, equipment), string, count = 1)
 
 
 def feat_sub(string, feat):
-    return sub(feat, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count=1)
+    return sub(feat, r"@Compendium[pf2e.feats-srd.%s]{%s}" % (feat, feat), string, count = 1)
 
 
 def spell_sub(string, spell):
-    return sub(spell, r"<em>@Compendium[pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count=1)
+    return sub(spell, r"<em>@Compendium[pf2e.spells-srd.%s]{%s}</em>" % (spell, spell), string, count = 1)
 
 
 def handle_actions(string):
@@ -87,7 +87,9 @@ def handle_conditions(string):
         string = condition_sub(string, condition)
 
     # Handle this one manually due to the lack of hyphen.
-    string = sub(r"flat footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count=1)
+    string = sub(r"flat footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count = 1)
+    # Catch off-guard and turn it into flat footed. Eventually this will be swapped.
+    string = sub(r"off-guard", r"@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]", string, count = 1)
 
     for condition in NUMBERED_CONDITIONS:
         for i in range(1, 6):
@@ -272,6 +274,72 @@ def format_monster_parts(string):
 
     return string
 
+# Fix the links, until we have a better way to do it.
+def fix_links(string):
+    string = string.replace("@Compendium[pf2e.conditionitems.Blinded]", "@UUID[Compendium.pf2e.conditionitems.Item.XgEqL1kFApUbl5Z2]")\
+        .replace("@Compendium[pf2e.conditionitems.Fatigued]", "@UUID[Compendium.pf2e.conditionitems.Item.HL2l2VRSaQHu9lUw]")\
+        .replace("@Compendium[pf2e.conditionitems.Confused]", "@UUID[Compendium.pf2e.conditionitems.Item.yblD8fOR1J8rDwEQ]")\
+        .replace("@Compendium[pf2e.conditionitems.Concealed]", "@UUID[Compendium.pf2e.conditionitems.Item.DmAIPqOBomZ7H95W]")\
+        .replace("@Compendium[pf2e.conditionitems.Dazzled]", "@UUID[Compendium.pf2e.conditionitems.Item.TkIyaNPgTZFBCCuh]")\
+        .replace("@Compendium[pf2e.conditionitems.Deafened]", "@UUID[Compendium.pf2e.conditionitems.Item.9PR9y0bi4JPKnHPR]")\
+        .replace("@Compendium[pf2e.conditionitems.Invisible]", "@UUID[Compendium.pf2e.conditionitems.Item.zJxUflt9np0q4yML]")\
+        .replace("@Compendium[pf2e.conditionitems.Flat-Footed]", "@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]")\
+        .replace("@Compendium[pf2e.conditionitems.Immobilized]", "@UUID[Compendium.pf2e.conditionitems.Item.eIcWbB5o3pP6OIMe]")\
+        .replace("@Compendium[pf2e.conditionitems.Prone]", "@UUID[Compendium.pf2e.conditionitems.Item.j91X7x0XSomq8d60]")\
+        .replace("@Compendium[pf2e.conditionitems.Unconscious]", "@UUID[Compendium.pf2e.conditionitems.Item.fBnFDH2MTzgFijKf]")\
+        .replace("@Compendium[pf2e.conditionitems.Fascinated]", "@UUID[Compendium.pf2e.conditionitems.Item.AdPVz7rbaVSRxHFg]")\
+        .replace("@Compendium[pf2e.conditionitems.Paralyzed]", "@UUID[Compendium.pf2e.conditionitems.Item.6uEgoh53GbXuHpTF]")\
+        .replace("@Compendium[pf2e.conditionitems.Hidden]", "@UUID[Compendium.pf2e.conditionitems.Item.iU0fEDdBp3rXpTMC]")\
+        .replace("@Compendium[pf2e.conditionitems.Quickened]", "@UUID[Compendium.pf2e.conditionitems.Item.nlCjDvLMf2EkV2dl]")\
+        .replace("@Compendium[pf2e.conditionitems.Fleeing]", "@UUID[Compendium.pf2e.conditionitems.Item.sDPxOjQ9kx2RZE8D]")\
+        .replace("@Compendium[pf2e.conditionitems.Restrained]", "@UUID[Compendium.pf2e.conditionitems.Item.VcDeM8A5oI6VqhbM]")\
+        .replace("@Compendium[pf2e.conditionitems.Grabbed]", "@UUID[Compendium.pf2e.conditionitems.Item.kWc1fhmv9LBiTuei]")\
+        .replace("@Compendium[pf2e.conditionitems.Clumsy]", "@UUID[Compendium.pf2e.conditionitems.Item.i3OJZU2nk64Df3xm]")\
+        .replace("@Compendium[pf2e.conditionitems.Doomed]", "@UUID[Compendium.pf2e.conditionitems.Item.3uh1r86TzbQvosxv]")\
+        .replace("@Compendium[pf2e.conditionitems.Drained]", "@UUID[Compendium.pf2e.conditionitems.Item.4D2KBtexWXa6oUMR]")\
+        .replace("@Compendium[pf2e.conditionitems.Enfeebled]", "@UUID[Compendium.pf2e.conditionitems.Item.MIRkyAjyBeXivMa7]")\
+        .replace("@Compendium[pf2e.conditionitems.Slowed]", "@UUID[Compendium.pf2e.conditionitems.Item.xYTAsEpcJE1Ccni3]")\
+        .replace("@Compendium[pf2e.conditionitems.Frightened]", "@UUID[Compendium.pf2e.conditionitems.Item.TBSHQspnbcqxsmjL]")\
+        .replace("@Compendium[pf2e.conditionitems.Sickened]", "@UUID[Compendium.pf2e.conditionitems.Item.fesd1n5eVhpCSS18]")\
+        .replace("@Compendium[pf2e.conditionitems.Stunned]", "@UUID[Compendium.pf2e.conditionitems.Item.dfCMdR4wnpbYNTix]")\
+        .replace("@Compendium[pf2e.conditionitems.Stupefied]", "@UUID[Compendium.pf2e.conditionitems.Item.e1XGnhKNSQIm5IXg]")\
+        .replace("@Compendium[pf2e.actionspf2e.Avoid Notice]", "@UUID[Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn]")\
+        .replace("@Compendium[pf2e.actionspf2e.Balance]", "@UUID[Compendium.pf2e.actionspf2e.Item.M76ycLAqHoAgbcej]")\
+        .replace("@Compendium[pf2e.actionspf2e.Coerce]", "@UUID[Compendium.pf2e.actionspf2e.Item.tHCqgwjtQtzNqVvd]")\
+        .replace("@Compendium[pf2e.actionspf2e.Crawl]", "@UUID[Compendium.pf2e.actionspf2e.Item.Tj055UcNm6UEgtCg]")\
+        .replace("@Compendium[pf2e.actionspf2e.Create a Diversion]", "@UUID[Compendium.pf2e.actionspf2e.Item.GkmbTGfg8KcgynOA]")\
+        .replace("@Compendium[pf2e.actionspf2e.Demoralize]", "@UUID[Compendium.pf2e.actionspf2e.Item.2u915NdUyQan6uKF]")\
+        .replace("@Compendium[pf2e.actionspf2e.Disable Device]", "@UUID[Compendium.pf2e.actionspf2e.Item.cYdz2grcOcRt4jk6]")\
+        .replace("@Compendium[pf2e.actionspf2e.Disarm]", "@UUID[Compendium.pf2e.actionspf2e.Item.Dt6B1slsBy8ipJu9]")\
+        .replace("@Compendium[pf2e.actionspf2e.Earn Income]", "@UUID[Compendium.pf2e.actionspf2e.Item.QyzlsLrqM0EEwd7j]")\
+        .replace("@Compendium[pf2e.actionspf2e.Escape]", "@UUID[Compendium.pf2e.actionspf2e.Item.SkZAQRkLLkmBQNB9]")\
+        .replace("@Compendium[pf2e.actionspf2e.Feint]", "@UUID[Compendium.pf2e.actionspf2e.Item.QNAVeNKtHA0EUw4X]")\
+        .replace("@Compendium[pf2e.actionspf2e.Force Open]", "@UUID[Compendium.pf2e.actionspf2e.Item.SjmKHgI7a5Z9JzBx]")\
+        .replace("@Compendium[pf2e.actionspf2e.Grab an Edge]", "@UUID[Compendium.pf2e.actionspf2e.Item.3yoajuKjwHZ9ApUY]")\
+        .replace("@Compendium[pf2e.actionspf2e.Grapple]", "@UUID[Compendium.pf2e.actionspf2e.Item.PMbdMWc2QroouFGD]")\
+        .replace("@Compendium[pf2e.actionspf2e.High Jump]", "@UUID[Compendium.pf2e.actionspf2e.Item.2HJ4yuEFY1Cast4h]")\
+        .replace("@Compendium[pf2e.actionspf2e.Leap]", "@UUID[Compendium.pf2e.actionspf2e.Item.d5I6018Mci2SWokk]")\
+        .replace("@Compendium[pf2e.actionspf2e.Long Jump]", "@UUID[Compendium.pf2e.actionspf2e.Item.JUvAvruz7yRQXfz2]")\
+        .replace("@Compendium[pf2e.actionspf2e.Make an Impression]", "@UUID[Compendium.pf2e.actionspf2e.Item.OX4fy22hQgUHDr0q]")\
+        .replace("@Compendium[pf2e.actionspf2e.Mount]", "@UUID[Compendium.pf2e.actionspf2e.Item.PM5jvValFkbFH3TV]")\
+        .replace("@Compendium[pf2e.actionspf2e.Perform]", "@UUID[Compendium.pf2e.actionspf2e.Item.EEDElIyin4z60PXx]")\
+        .replace("@Compendium[pf2e.actionspf2e.Search]", "@UUID[Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU]")\
+        .replace("@Compendium[pf2e.actionspf2e.Seek]", "@UUID[Compendium.pf2e.actionspf2e.Item.BlAOM2X92SI6HMtJ]")\
+        .replace("@Compendium[pf2e.actionspf2e.Sense Motive]", "@UUID[Compendium.pf2e.actionspf2e.Item.1xRFPTFtWtGJ9ELw]")\
+        .replace("@Compendium[pf2e.actionspf2e.Shove]", "@UUID[Compendium.pf2e.actionspf2e.Item.7blmbDrQFNfdT731]")\
+        .replace("@Compendium[pf2e.actionspf2e.Sneak]", "@UUID[Compendium.pf2e.actionspf2e.Item.VMozDqMMuK5kpoX4]")\
+        .replace("@Compendium[pf2e.actionspf2e.Steal]", "@UUID[Compendium.pf2e.actionspf2e.Item.RDXXE7wMrSPCLv5k]")\
+        .replace("@Compendium[pf2e.actionspf2e.Take Cover]", "@UUID[Compendium.pf2e.actionspf2e.Item.ust1jJSCZQUhBZIz]")\
+        .replace("@Compendium[pf2e.actionspf2e.Track]", "@UUID[Compendium.pf2e.actionspf2e.Item.EA5vuSgJfiHH7plD]")\
+        .replace("@Compendium[pf2e.actionspf2e.Treat Disease]", "@UUID[Compendium.pf2e.actionspf2e.Item.TC7OcDa7JlWbqMaN]")\
+        .replace("@Compendium[pf2e.actionspf2e.Treat Poison]", "@UUID[Compendium.pf2e.actionspf2e.Item.KjoCEEmPGTeFE4hh]")\
+        .replace("@Compendium[pf2e.actionspf2e.Treat Wounds]", "@UUID[Compendium.pf2e.actionspf2e.Item.1kGNdIIhuglAjIp9]")\
+        .replace("@Compendium[pf2e.actionspf2e.Trip]", "@UUID[Compendium.pf2e.actionspf2e.Item.ge56Lu1xXVFYUnLP]")\
+        .replace("@Compendium[pf2e.actionspf2e.Tumble Through]", "@UUID[Compendium.pf2e.actionspf2e.Item.21WIfSu7Xd7uKqV8]")
+        
+    return string
+    
+
 def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False):
     # Initial handling not using regex.
     string = "<p>" + text.replace("Trigger", "<p><strong>Trigger</strong>")\
@@ -341,9 +409,10 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     if monster_parts:
         string = format_monster_parts(string)
     
-    string = handle_equipment(string)
-    string = handle_feats(string)
-    string = handle_spells(string)
+    string = fix_links(string)
+    # string = handle_equipment(string)
+    # string = handle_feats(string)
+    # string = handle_spells(string)
     # string = handle_innate_spell_links(string)
     string = handle_counteract(string)
     
@@ -405,7 +474,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.14")
+root.title("PF2e on Foundry VTT Data Entry v 2.15")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
