@@ -29,6 +29,8 @@ NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Fr
 
 BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault"]
 
+DAMAGE_TYPES = r"(bludgeoning|piercing|slashing|bleed|positive|negative|vitality|void|acid|cold|electricity|fire|sonic|force|chaotic|lawful|good|evil|spirit|untyped)"
+
 EQUIPMENT = []#"Handwraps of Mighty Blows"]
 
 FEATS = []#"Canny Acumen", "Quick Jump"]
@@ -125,12 +127,15 @@ def handle_activation_actions(string):
 
 
 def handle_damage_rolls(string):
-    string = sub(r" (\d+) (\w*) damage", r" [[/r \1[\2]]] damage", string)
-    string = sub(r"(\d+)d(\d+)\+(\d+) (\w*) damage", r"[[/r (\1d\2+\3)[\4]]] damage", string)
-    string = sub(r"(\d+)d(\d+) persistent (\w*) damage", r"[[/r \1d\2[persistent,\3]]] damage", string)
-    string = sub(r"(\d+)d(\d+) (\w*) damage", r"[[/r \1d\2[\3]]] damage", string)
-    string = sub(r"(\d+)d(\d+) (\w+)(\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
+    string = sub(r" (\d+) %s damage" % DAMAGE_TYPES, r" @Damage[\1[\2]] damage", string)
+    string = sub(r"(\d+)d(\d+)\+(\d+) %s damage" % DAMAGE_TYPES, r"@Damage[(\1d\2+\3)[\4]] damage", string)
+    string = sub(r"(\d+)d(\d+) persistent %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[persistent,\3]] damage", string)
+    string = sub(r"(\d+)d(\d+) %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[\3]] damage", string)
+    string = sub(r"(\d+)d(\d+) (\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
     string = sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]].", string)
+    
+    string = string.replace(r"[void]", r"[negative]")
+    string = string.replace(r"[vitality]", r"[positive]")
     return string
 
 
@@ -474,7 +479,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.15")
+root.title("PF2e on Foundry VTT Data Entry v 2.16")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
