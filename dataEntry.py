@@ -22,14 +22,14 @@ ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
 
 CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Invisible",
               "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed",
-              "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed"]
+              "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed", "Off-Guard"]
 
 NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened",
                        "Stunned", "Stupefied", "Quickened"]
 
 BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault"]
 
-DAMAGE_TYPES = r"(bludgeoning|piercing|slashing|bleed|positive|negative|vitality|void|acid|cold|electricity|fire|sonic|force|chaotic|lawful|good|evil|spirit|untyped)"
+DAMAGE_TYPES = r"(bludgeoning|piercing|slashing|bleed|positive|negative|vitality|void|acid|cold|electricity|fire|mental|sonic|force|chaotic|lawful|good|evil|spirit|untyped)"
 
 EQUIPMENT = []#"Handwraps of Mighty Blows"]
 
@@ -89,9 +89,10 @@ def handle_conditions(string):
         string = condition_sub(string, condition)
 
     # Handle this one manually due to the lack of hyphen.
-    string = sub(r"flat footed", r"%sFlat-Footed]{Flat-Footed}" % CONDITION_COMPENDIUM, string, count = 1)
-    # Catch off-guard and turn it into flat footed. Eventually this will be swapped.
+    string = sub(r"flat footed", r"%sFlat-Footed]" % CONDITION_COMPENDIUM, string, count = 1)
+    # Catch flat-footed and turn it into off-guard. Eventually this will be swapped.
     string = sub(r"off-guard", r"@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]", string, count = 1)
+    string = sub(r"{Flat-Footed}", "", string)
 
     for condition in NUMBERED_CONDITIONS:
         for i in range(1, 6):
@@ -246,7 +247,7 @@ def ancestry_format(string):
     string = sub(r"(?i)Y\s*O\s*U M\s*I\s*G\s*H\s*T\s*...", r"</p><h2>You Might...</h2>", string)
     string = sub(r"O\s*T\s*H\s*E\s*R\s*S P\s*R\s*O\s*B\s*A\s*B\s*L\s*Y\s*...", r"</ul><h2>Others Probably...</h2><ul>", string, flags=re.IGNORECASE)
     string = sub(r"(?i)P\s*H\s*Y\s*S\s*I\s*C\s*A\s*L D\s*E\s*S\s*C\s*R\s*I\s*P\s*T\s*I\s*O\s*N", r"</ul><h2>Physical Description</h2><p>", string)
-    string = sub(r"(?i)S\s*O\s*C\s*I\s*E\s*T\s*Y", r"</p><h2>Society</h2><p>", string)
+    string = sub(r"(?i)S\s*O\s*C\s*I\s*E\s*T\s*Y", r"</p><h2>Society</h2><p>", string, count = 1)
     string = sub(r"(?i)A\s*L\s*I\s*G\s*N\s*M\s*E\s*N\s*T A\s*N\s*D R\s*E\s*L\s*I\s*G\s*I\s*O\s*N", r"</p><h2>Alignment and religion</h2><p>", string)
     string = sub(r"NAMES", r"</p><h2>Names</h2><p>", string)
     string = sub(r"(?i)S\s*a\s*m\s*p\s*l\s*e N\s*a\s*m\s*e\s*S", r"</p><h3>Sample Names</h3><p>", string)
@@ -273,7 +274,7 @@ def remove_books(string):
 
 
 def format_monster_parts(string):
-    string = string.replace("Monster Parts", "<p><strong>Monster Parts</strong>")\
+    string = string.replace("Monster Parts", "<h2>Suggested Monster Parts</h2><p><strong>Monster Parts</strong>")\
         .replace("Eligible Refinements", "</p><p><strong>Eligible Refinements</strong>")\
         .replace("Eligible Imbued Properties", "</p><p><strong>Eligible Imbued Properties</strong>")
 
@@ -480,7 +481,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.16")
+root.title("PF2e on Foundry VTT Data Entry v 2.17")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
