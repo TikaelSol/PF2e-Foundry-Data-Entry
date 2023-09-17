@@ -29,7 +29,7 @@ NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Fr
 
 BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault"]
 
-DAMAGE_TYPES = r"(bludgeoning|piercing|slashing|bleed|positive|negative|vitality|void|acid|cold|electricity|fire|mental|sonic|force|chaotic|lawful|good|evil|spirit|untyped)"
+DAMAGE_TYPES = r"(bludgeoning|piercing|slashing|bleed|positive|negative|vitality|void|acid|cold|electricity|fire|mental|sonic|force|chaotic|lawful|good|evil|spirit|poison|untyped)"
 
 EQUIPMENT = []#"Handwraps of Mighty Blows"]
 
@@ -481,7 +481,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.17")
+root.title("PF2e on Foundry VTT Data Entry v 2.18")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
