@@ -135,8 +135,8 @@ def handle_damage_rolls(string):
     string = sub(r"(\d+)d(\d+) (\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
     string = sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]].", string)
     
-    string = string.replace(r"[void]", r"[negative]")
-    string = string.replace(r"[vitality]", r"[positive]")
+    string = string.replace(r"[negative]", r"[void]")
+    string = string.replace(r"[positive]", r"[vitality]")
     return string
 
 
@@ -355,6 +355,8 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         .replace("\nFailure", "</p><p><strong>Failure</strong>")\
         .replace("\nCritical Failure", "</p><p><strong>Critical Failure</strong>")\
         .replace("\nSpecial", "</p><p><strong>Special</strong>")\
+        .replace("-\n","-")\
+        .replace("—\n","—")\
         .replace("\n", " ")\
         .replace("Frequency", "<p><strong>Frequency</strong>")\
         .replace("Effect", "</p><hr /><p><strong>Effect</strong>")\
@@ -439,8 +441,11 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = string.replace(";</p>","</p>")
     string = string.replace("<p> ","<p>")
     
-    # Sneak attack features have different text requirements so we undo some of the changes made
-    string = sub(r"deals an additional \[\[/r {(\d)d(\d)}\[precision\]\]\]{(\d)d(\d) precision damage} to @Compendium\[pf2e.conditionitems.Flat-Footed\]{Flat-Footed} creatures.", r"deals an additional \1d\2 precision damage to flat-footed creatures.", string)
+    # Catch non-link references to flat footed.
+    string = string.replace("flat footed", "off-guard").replace("flat-footed", "off-guard")
+    
+    # # Sneak attack features have different text requirements so we undo some of the changes made
+    # string = sub(r"deals an additional \[\[/r {(\d)d(\d)}\[precision\]\]\]{(\d)d(\d) precision damage} to @Compendium\[pf2e.conditionitems.Flat-Footed\]{Flat-Footed} creatures.", r"deals an additional \1d\2 precision damage to flat-footed creatures.", string)
     
             
     if add_gm_text:
@@ -481,7 +486,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.18")
+root.title("PF2e on Foundry VTT Data Entry v 2.19")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
