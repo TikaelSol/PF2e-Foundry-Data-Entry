@@ -179,9 +179,10 @@ def handle_third_party(string):
 
 def handle_background(string):
     string = sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
+    string = sub(r"Choose two attribute boosts.", r"</p><p>Choose two attribute boosts.", string)
     string = sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
     string = sub(r"You're trained in", r"</p><p>You're trained in", string)
-    string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
+    # string = sub(r"You gain the (.*) skill feat",r"You gain the @Compendium[pf2e.feats-srd.\1]{\1} skill feat",string)
     return string
 
 
@@ -379,6 +380,8 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub("Access", "<p><strong>Access</strong>", string, count=1)
     string = sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
     string = sub(r"Activate (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate</strong> \1 \2", string)
+    string = sub(r"Activate—(.*?) \?", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>1</span>", string)
+    string = sub(r"Activate—(.*?) (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate—\1</strong> \2 \3", string)
     
     string = sub(r"can't use (.*?) again for (\d)d(\d) rounds", r"can't use \1 again for [[/br \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
     string = sub(r"can't (.*?) again for (\d)d(\d) rounds", r"can't \1 again for [[/br \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
@@ -432,7 +435,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     
     string = remove_books(string)    
 
-    if "Choose two ability boosts" in string:
+    if "Choose two ability boosts" in string or "Choose two attribute boosts" in string:
         string = handle_background(string)
         
     string = string.replace("<p></p>","").replace("<p><p>","<p>")
@@ -486,7 +489,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.19")
+root.title("PF2e on Foundry VTT Data Entry v 2.20")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
