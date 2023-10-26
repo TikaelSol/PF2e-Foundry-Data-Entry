@@ -16,7 +16,7 @@ CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
 ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
            "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
            "Force Open", "Grab an Edge", "Grapple", "High Jump", "Leap", "Liberating Step", "Long Jump",
-           "Make an Impression", "Mount", "Perform", "Search", "Seek", "Sense Motive", "Shove", "Sneak",
+           "Make an Impression", "Mount", "Perform", "Reposition", "Search", "Seek", "Sense Motive", "Shove", "Sneak",
            "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds",
            "Trip", "Tumble Through"]
 
@@ -27,7 +27,7 @@ CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafen
 NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened",
                        "Stunned", "Stupefied", "Quickened"]
 
-BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault"]
+BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault", "Player Core", "GM Core", "Pathfinder Player Core", "Pathfinder GM Core"]
 
 DAMAGE_TYPES = r"(bludgeoning|piercing|slashing|bleed|positive|negative|vitality|void|acid|cold|electricity|fire|mental|sonic|force|chaotic|lawful|good|evil|spirit|poison|untyped)"
 
@@ -91,7 +91,7 @@ def handle_conditions(string):
     # Handle this one manually due to the lack of hyphen.
     string = sub(r"flat footed", r"%sFlat-Footed]" % CONDITION_COMPENDIUM, string, count = 1)
     # Catch flat-footed and turn it into off-guard. Eventually this will be swapped.
-    string = sub(r"off-guard", r"@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]", string, count = 1)
+    # string = sub(r"off-guard", r"@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]", string, count = 1)
     string = sub(r"{Flat-Footed}", "", string)
 
     for condition in NUMBERED_CONDITIONS:
@@ -291,6 +291,7 @@ def fix_links(string):
         .replace("@Compendium[pf2e.conditionitems.Deafened]", "@UUID[Compendium.pf2e.conditionitems.Item.9PR9y0bi4JPKnHPR]")\
         .replace("@Compendium[pf2e.conditionitems.Invisible]", "@UUID[Compendium.pf2e.conditionitems.Item.zJxUflt9np0q4yML]")\
         .replace("@Compendium[pf2e.conditionitems.Flat-Footed]", "@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]")\
+        .replace("@Compendium[pf2e.conditionitems.Off-Guard]", "@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]")\
         .replace("@Compendium[pf2e.conditionitems.Immobilized]", "@UUID[Compendium.pf2e.conditionitems.Item.eIcWbB5o3pP6OIMe]")\
         .replace("@Compendium[pf2e.conditionitems.Prone]", "@UUID[Compendium.pf2e.conditionitems.Item.j91X7x0XSomq8d60]")\
         .replace("@Compendium[pf2e.conditionitems.Unconscious]", "@UUID[Compendium.pf2e.conditionitems.Item.fBnFDH2MTzgFijKf]")\
@@ -330,6 +331,7 @@ def fix_links(string):
         .replace("@Compendium[pf2e.actionspf2e.Make an Impression]", "@UUID[Compendium.pf2e.actionspf2e.Item.OX4fy22hQgUHDr0q]")\
         .replace("@Compendium[pf2e.actionspf2e.Mount]", "@UUID[Compendium.pf2e.actionspf2e.Item.PM5jvValFkbFH3TV]")\
         .replace("@Compendium[pf2e.actionspf2e.Perform]", "@UUID[Compendium.pf2e.actionspf2e.Item.EEDElIyin4z60PXx]")\
+        .replace("@Compendium[pf2e.actionspf2e.Reposition]", "@UUID[Compendium.pf2e.actionspf2e.Item.lOE4yjUnETTdaf2T]")\
         .replace("@Compendium[pf2e.actionspf2e.Search]", "@UUID[Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU]")\
         .replace("@Compendium[pf2e.actionspf2e.Seek]", "@UUID[Compendium.pf2e.actionspf2e.Item.BlAOM2X92SI6HMtJ]")\
         .replace("@Compendium[pf2e.actionspf2e.Sense Motive]", "@UUID[Compendium.pf2e.actionspf2e.Item.1xRFPTFtWtGJ9ELw]")\
@@ -345,17 +347,29 @@ def fix_links(string):
         .replace("@Compendium[pf2e.actionspf2e.Tumble Through]", "@UUID[Compendium.pf2e.actionspf2e.Item.21WIfSu7Xd7uKqV8]")
         
     return string
+
+
+def preProcessSpellHeader(string):
+    string = sub(r"\nRange (\d+) feet; (Targets|Target) (.*?)\n", r"<hr>", string)
+    string = sub(r"\nRange (\d+) feet;\n", r"<hr>", string)
+    string = sub(r"\nArea (\d+)-foot (\w+)\n", r"<hr>", string)
+    string = sub(r"\nArea (\d+)-foot (\w+) (Targets|Target) (.*?)\n", r"<hr>", string)
+    string = sub(r"Defense (\w+)\n", r"<hr>", string)
+    string = sub(r"(<hr>)+", r"<hr>", string)
     
+    return string
 
 def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False):
     # Initial handling not using regex.
-    string = "<p>" + text.replace("Trigger", "<p><strong>Trigger</strong>")\
+    string = "<p>" + text
+    string = preProcessSpellHeader(string)
+    string = string.replace("Trigger", "<p><strong>Trigger</strong>")\
         .replace(" "," ")\
         .replace("\nCritical Success", "</p><hr /><p><strong>Critical Success</strong>")\
         .replace("\nSuccess", "</p><p><strong>Success</strong>")\
         .replace("\nFailure", "</p><p><strong>Failure</strong>")\
         .replace("\nCritical Failure", "</p><p><strong>Critical Failure</strong>")\
-        .replace("\nSpecial", "</p><p><strong>Special</strong>")\
+        .replace("\nSpecial", "</p><hr><p><strong>Special</strong>")\
         .replace("-\n","-")\
         .replace("—\n","—")\
         .replace("\n", " ")\
@@ -489,7 +503,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.20")
+root.title("PF2e on Foundry VTT Data Entry v 2.21")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
