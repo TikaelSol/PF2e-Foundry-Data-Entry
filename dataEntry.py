@@ -231,14 +231,6 @@ def handle_inlines_checks(string):
     string = sub(r"basic %s save against your class DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classDC.value)|basic:true] save against your class DC", string)
     string = sub(r"%s save against your class DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classDC.value)] save against your class DC", string)
     
-    # Lores - capture 1-2 words between 'DC ##' and 'Lore'
-    def sluggify_lore(match):
-        dc_number = match.group(1)
-        lore_words = match.group(2).strip() + " Lore"
-        sluggified_lore = lore_words.replace(" ", "-").lower()
-        return f"@Check[type:{sluggified_lore}|dc:{dc_number}]"
-    
-    string = sub(r"%s ((?:\w+\s+){1,2})Lore" % DC, sluggify_lore, string)
 
     # Catch capitalized saves
     string = sub(r"type:%s" % SAVES, convert_to_lower, string)
