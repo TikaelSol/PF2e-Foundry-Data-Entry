@@ -8,7 +8,8 @@ DC = r"DC (\d+)"
 
 ABILITY_SCORES = r"(Strength|Dexterity|Constitution|Intelligence|Wisdom|Charisma)"
 SAVES = r"(Reflex|Will|Fortitude)"
-SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|Intimidation|Medicine|Nature|" \
+SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|" \
+         r"Intimidation|Medicine|Nature|Computers|Piloting|" \
          r"Occultism|Performance|Religion|Society|Stealth|Survival|Thievery)"
 
 CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
@@ -24,8 +25,11 @@ CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafen
               "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed",
               "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed", "Off-Guard"]
 
-NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened",
-                       "Stunned", "Stupefied", "Quickened"]
+SF_CONDITIONS = ["Suppressed", "Untethered"]
+
+NUMBERED_CONDITIONS = ["Clumsy", "Doomed", "Drained", "Enfeebled", "Slowed", "Frightened", "Sickened", "Stunned", "Stupefied", "Quickened", "Wounded"]
+
+SF_NUMBERED_CONDITIONS = ["Glitching"]
 
 BOOK_TITLES = ["Core Rulebook", "Advanced Player's Guide", "Bestiary", "Bestiary 2", "Bestiary 3", "Book of the Dead", "Guns & Gears", "Secrets of Magic", "Lost Omens Gods & Magic", "Lost Omens The Mwangi Expanse", "Lost Omens World Guide", "Lost Omens Character Guide", "Lost Omens Legends", "Lost Omens Pathfinder Society Guide", "Lost Omens Ancestry Guide", "Lost Omens The Grand Bazaar", "Lost Omens Absalom, City of Lost Omens", "Lost Omens Monsters of Myth", "Lost Omens Knights of Lastwall", "Lost Omens Travel Guide", "Lost Omens Impossible Lands", "Lost Omens Highhelm", "Lost Omens Firebrands", "Treasure Vault", "Player Core", "GM Core", "Pathfinder Player Core", "Pathfinder GM Core"]
 
@@ -84,8 +88,8 @@ def handle_actions(string):
     return string
 
 
-def handle_conditions(string):
-    for condition in CONDITIONS:
+def handle_conditions(string, condition_list, numbered_condition_list):
+    for condition in condition_list:
         string = condition_sub(string, condition)
 
     # Handle this one manually due to the lack of hyphen.
@@ -94,7 +98,7 @@ def handle_conditions(string):
     # string = sub(r"off-guard", r"@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]", string, count = 1)
     string = sub(r"{Flat-Footed}", "", string)
 
-    for condition in NUMBERED_CONDITIONS:
+    for condition in numbered_condition_list:
         for i in range(1, 6):
             string = condition_sub_with_stage(string, condition, i)
     return string
@@ -132,6 +136,7 @@ def handle_damage_rolls(string):
     string = sub(r"(\d+)d(\d+)\+(\d+) %s damage" % DAMAGE_TYPES, r"@Damage[(\1d\2+\3)[\4]] damage", string)
     string = sub(r"(\d+)d(\d+) persistent %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[persistent,\3]] damage", string)
     string = sub(r"(\d+)d(\d+) %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[\3]] damage", string)
+    string = sub(r"(\d+)d(\d+) damage", r"@Damage[\1d\2[untyped]] damage", string)
     string = sub(r"(\d+)d(\d+) (\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
     string = sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]].", string)
     
@@ -218,6 +223,8 @@ def handle_inlines_checks(string):
     string = sub(r"%s \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
     string = sub(r"%s save \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2] save", string)
 
+    string = sub(r"%s %s or %s" % (DC, SKILLS, SKILLS), r"@Check[type:\2|dc:\1] or @Check[type:\3|dc:\1]", string)
+    string = sub(r"%s %s (trained|expert|master|legendary) or %s" % (DC, SKILLS, SKILLS), r"@Check[type:\2|dc:\1] (\3) or @Check[type:\4|dc:\1]", string)
     string = sub(r"%s %s" % (DC, SKILLS), r"@Check[type:\2|dc:\1]", string)
     string = sub(r"%s %s" % (SKILLS, DC), r"@Check[type:\1|dc:\2]", string)
     string = sub(r"%s \(%s\)" % (SKILLS, DC), r"@Check[type:\1|dc:\2", string)
@@ -235,6 +242,10 @@ def handle_inlines_checks(string):
     # Catch capitalized saves
     string = sub(r"type:%s" % SAVES, convert_to_lower, string)
     string = sub(r"type:%s" % SKILLS, convert_to_lower, string)
+    
+    # Lores - capture 1-2 words between 'DC ##' and 'Lore'    
+    string = sub(r"%s ((?:\w+\s+){1,2})Lore" % DC, r"@Check[type:\2Lore|dc:\1]", string)
+    
     return string
 
 
@@ -311,6 +322,10 @@ def fix_links(string):
         .replace("@Compendium[pf2e.conditionitems.Sickened]", "@UUID[Compendium.pf2e.conditionitems.Item.fesd1n5eVhpCSS18]")\
         .replace("@Compendium[pf2e.conditionitems.Stunned]", "@UUID[Compendium.pf2e.conditionitems.Item.dfCMdR4wnpbYNTix]")\
         .replace("@Compendium[pf2e.conditionitems.Stupefied]", "@UUID[Compendium.pf2e.conditionitems.Item.e1XGnhKNSQIm5IXg]")\
+        .replace("@Compendium[pf2e.conditionitems.Wounded]", "@UUID[Compendium.pf2e.conditionitems.Item.Yl48xTdMh3aeQYL2]")\
+        .replace("@Compendium[pf2e.conditionitems.Glitching]", "@UUID[Compendium.starfinder-field-test-for-pf2e.conditions.Item.6A2QDy8wRGCVQsSd]")\
+        .replace("@Compendium[pf2e.conditionitems.Suppressed]", "@UUID[Compendium.starfinder-field-test-for-pf2e.conditions.Item.enA7BxAjBb7ns1iF]")\
+        .replace("@Compendium[pf2e.conditionitems.Untethered]", "@UUID[Compendium.starfinder-field-test-for-pf2e.conditions.Item.z1ucw4CLwLqHoAp3]")\
         .replace("@Compendium[pf2e.actionspf2e.Avoid Notice]", "@UUID[Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn]")\
         .replace("@Compendium[pf2e.actionspf2e.Balance]", "@UUID[Compendium.pf2e.actionspf2e.Item.M76ycLAqHoAgbcej]")\
         .replace("@Compendium[pf2e.actionspf2e.Coerce]", "@UUID[Compendium.pf2e.actionspf2e.Item.tHCqgwjtQtzNqVvd]")\
@@ -359,7 +374,17 @@ def preProcessSpellHeader(string):
     
     return string
 
-def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False):
+def eldamonMode(string):
+    # Skills and saves
+    string = sub(r"basic (\w+) save", r"@Check[type:\1|dc:resolve(@actor.system.proficiencies.classDCs.eldamon.dc)|basic:true] save", string, count = 1)
+    string = sub(r"(\w+) save", r"@Check[type:\1|dc:resolve(@actor.system.proficiencies.classDCs.eldamon.dc)] save", string, count = 1)
+    string = sub(r"@Damage\[1d(\d+)\[(\w+)\]\] damage plus \@Damage\[1d(\d+)\[(\w+)\]\] damage for (each|every) level you have", r"@Damage[(1+@actor.level)d\1[\2]]", string)
+    string = sub(r"(melee|ranged) power attack roll", r"@Check[type:eldamon|defense:ac]{\1 power attack roll}", string, count = 1)
+    string = string.replace(r"roll}s", r"rolls}")
+    
+    return string
+
+def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, starfinder_mode = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False, eldamon_mode = False):
     # Initial handling not using regex.
     string = "<p>" + text
     string = preProcessSpellHeader(string)
@@ -377,14 +402,17 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         .replace("Effect", "</p><hr /><p><strong>Effect</strong>")\
         .replace("Cost", "<strong>Cost</strong>") + "</p>"
     string = string.replace("<p><p>", "<p>")\
-        .replace(r"”", r'"')\
-        .replace(r"“", r'"')\
         .replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
         .replace("Onset", "</p><p><strong>Onset</strong>")\
-        .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")
+        .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")\
+        .replace("f at-footed", "flat-footed").replace("Ef ect", "Effect") # Fix common Paizo pre-release PDF formatting errors
+        
+    if starfinder_mode:
+        condition_list = CONDITIONS + SF_CONDITIONS
+        numbered_condition_list = SF_NUMBERED_CONDITIONS
         
     if remove_non_ASCII:
-        string = string.replace("’", "'")
+        string = string.replace("’", "'").replace(r"”", r'"').replace(r"“", r'"')
     
     string = sub(r"(Requirements|Requirement)", r"</p><p><strong>Requirements</strong>", string)
     string = sub(r" Craft </p><p><strong>Requirements</strong>", r"</p><hr /><p><strong>Craft Requirements</strong>", string)
@@ -395,11 +423,18 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
     string = sub(r"Activate (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate</strong> \1 \2", string)
     string = sub(r"Activate—(.*?) \?", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>1</span>", string)
+    string = sub(r"Activate—(.*?) \[reaction\]", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>r</span>", string)
+    string = sub(r"Activate—(.*?) \[one-action\]", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>1</span>", string)
+    string = sub(r"Activate—(.*?) \[two-actions\]", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>2</span>", string)
+    string = sub(r"Activate—(.*?) \[three-actions\]", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>3</span>", string)
+    string = sub(r"Activate—(.*?) \[free-action\]", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>f</span>", string)
     string = sub(r"Activate—(.*?) (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate—\1</strong> \2 \3", string)
+    string = string.replace(r"<p><strong></p>",r"")
     
     string = sub(r"can't use (.*?) again for (\d)d(\d) rounds", r"can't use \1 again for [[/br \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
     string = sub(r"can't (.*?) again for (\d)d(\d) rounds", r"can't \1 again for [[/br \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
     string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/br \1d\2 #\3]]{\1d\2 \3}", string)
+    string = string.replace(r"or dispel magic (", r"or @UUID[Compendium.pf2e.spells-srd.Item.9HpwDN4MYQJnW0LG] (")
 
     if third_party:
         string = handle_third_party(string)
@@ -417,7 +452,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         string = handle_inlines_checks(string)
     
     if add_conditions:
-        string = handle_conditions(string)
+        string = handle_conditions(string, condition_list, numbered_condition_list)
 
     if inline_rolls:
         string = handle_damage_rolls(string)
@@ -464,6 +499,8 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     # # Sneak attack features have different text requirements so we undo some of the changes made
     # string = sub(r"deals an additional \[\[/r {(\d)d(\d)}\[precision\]\]\]{(\d)d(\d) precision damage} to @Compendium\[pf2e.conditionitems.Flat-Footed\]{Flat-Footed} creatures.", r"deals an additional \1d\2 precision damage to flat-footed creatures.", string)
     
+    if eldamon_mode:
+        string = eldamonMode(string)
             
     if add_gm_text:
         string = string.replace("<p><strong>Trigger</strong>", "<p data-visibility='gm'><strong>Trigger</strong>")
@@ -503,7 +540,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.21")
+root.title("PF2e on Foundry VTT Data Entry v 2.25")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
@@ -531,8 +568,10 @@ inline_rolls = BooleanVar(value = True)
 add_conditions = BooleanVar(value = True)
 add_actions = BooleanVar(value = True)
 add_inline_checks = BooleanVar(value = True)
+starfinder_mode = BooleanVar(value = True)
 add_inline_templates = BooleanVar(value = True)
 remove_non_ASCII = BooleanVar(value = True)
+eldamon_mode = BooleanVar(value = False)
 ###############################################################################
 
 
@@ -545,6 +584,7 @@ settings_menu = Menu(menu)
 settings_menu.add_checkbutton(label = "Copy Output to Clipboard", variable = use_clipboard)
 settings_menu.add_checkbutton(label = "Add GM Only Tags", variable = add_gm_text)
 settings_menu.add_checkbutton(label = "Handle Inline rolls", variable = inline_rolls)
+settings_menu.add_checkbutton(label = "Handle Starfinder 2e formatting", variable = starfinder_mode)
 settings_menu.add_checkbutton(label = "Add Inline Templates", variable = add_inline_templates)
 settings_menu.add_checkbutton(label = "Add Inline Checks", variable = add_inline_checks)
 settings_menu.add_checkbutton(label = "Add Condition Links", variable = add_conditions)
@@ -556,13 +596,14 @@ settings_menu.add_checkbutton(label = "Handle Eidolon Blocks", variable = eidolo
 settings_menu.add_checkbutton(label = "Handle Ancestry Description Text", variable = ancestry)
 settings_menu.add_checkbutton(label = "Handle Third Party Formatting (legacy)", variable = third_party)
 settings_menu.add_checkbutton(label = "Handle Monster Part Formatting (third party)", variable = monster_parts)
+settings_menu.add_checkbutton(label = "Handle Eldamon Powers (third party)", variable = eldamon_mode)
 
 menu.add_cascade(label = "Settings", menu = settings_menu)
 root.config(menu = menu)
 
 ##############################################################################
 
-reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), add_conditions.get(), add_actions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get(), replacement_mode.get(), monster_parts.get()))
+reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), starfinder_mode.get(), add_conditions.get(), add_actions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get(), replacement_mode.get(), monster_parts.get(), eldamon_mode.get()))
 reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
 
 resetButton = Button(root, text="Clear Input", command = lambda: clearInput())
