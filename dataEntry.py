@@ -409,7 +409,10 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         
     if starfinder_mode:
         condition_list = CONDITIONS + SF_CONDITIONS
-        numbered_condition_list = SF_NUMBERED_CONDITIONS
+        numbered_condition_list = NUMBERED_CONDITIONS + SF_NUMBERED_CONDITIONS
+    else:
+        condition_list = CONDITIONS
+        numbered_condition_list = NUMBERED_CONDITIONS
         
     if remove_non_ASCII:
         string = string.replace("’", "'").replace(r"”", r'"').replace(r"“", r'"')
@@ -540,7 +543,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.25")
+root.title("PF2e on Foundry VTT Data Entry v 2.26")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
