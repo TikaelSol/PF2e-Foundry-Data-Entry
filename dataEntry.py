@@ -215,28 +215,28 @@ def eidolon_format(string):
 
 def handle_inlines_checks(string):
     # Skills and saves
-    string = sub(r"%s basic (\w+) save" % DC, r"@Check[type:\2|dc:\1|basic:true] save", string)
-    string = sub(r"basic (\w+) save %s" % DC, r"@Check[type:\1|dc:\2|basic:true] save", string)
-    string = sub(r"basic (\w+) %s" % DC, r"@Check[type:\1|dc:\2|basic:true]", string)
-    string = sub(r"%s %s" % (DC, SAVES), r"@Check[type:\2|dc:\1]", string)
-    string = sub(r"%s %s" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
-    string = sub(r"%s \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2]", string)
-    string = sub(r"%s save \(%s\)" % (SAVES, DC), r"@Check[type:\1|dc:\2] save", string)
+    string = sub(r"%s basic (\w+) save" % DC, r"@Check[\2|dc:\1|basic] save", string)
+    string = sub(r"basic (\w+) save %s" % DC, r"@Check[\1|dc:\2|basic] save", string)
+    string = sub(r"basic (\w+) %s" % DC, r"@Check[\1|dc:\2|basic]", string)
+    string = sub(r"%s %s" % (DC, SAVES), r"@Check[\2|dc:\1]", string)
+    string = sub(r"%s %s" % (SAVES, DC), r"@Check[\1|dc:\2]", string)
+    string = sub(r"%s \(%s\)" % (SAVES, DC), r"@Check[\1|dc:\2]", string)
+    string = sub(r"%s save \(%s\)" % (SAVES, DC), r"@Check[\1|dc:\2] save", string)
 
-    string = sub(r"%s %s or %s" % (DC, SKILLS, SKILLS), r"@Check[type:\2|dc:\1] or @Check[type:\3|dc:\1]", string)
-    string = sub(r"%s %s (trained|expert|master|legendary) or %s" % (DC, SKILLS, SKILLS), r"@Check[type:\2|dc:\1] (\3) or @Check[type:\4|dc:\1]", string)
-    string = sub(r"%s %s" % (DC, SKILLS), r"@Check[type:\2|dc:\1]", string)
-    string = sub(r"%s %s" % (SKILLS, DC), r"@Check[type:\1|dc:\2]", string)
-    string = sub(r"%s \(%s\)" % (SKILLS, DC), r"@Check[type:\1|dc:\2", string)
+    string = sub(r"%s %s or %s" % (DC, SKILLS, SKILLS), r"@Check[\2|dc:\1] or @Check[\3|dc:\1]", string)
+    string = sub(r"%s %s (trained|expert|master|legendary) or %s" % (DC, SKILLS, SKILLS), r"@Check[\2|dc:\1] (\3) or @Check[\4|dc:\1]", string)
+    string = sub(r"%s %s" % (DC, SKILLS), r"@Check[\2|dc:\1]", string)
+    string = sub(r"%s %s" % (SKILLS, DC), r"@Check[\1|dc:\2]", string)
+    string = sub(r"%s \(%s\)" % (SKILLS, DC), r"@Check[\1|dc:\2", string)
 
-    string = sub(r"(\w+) Lore %s" % DC, r"@Check[type:\2-lore|dc:\1]{\1 Lore}", string)
-    string = sub(r"%s (\w+) save" % DC, r"@Check[type:\2|dc:\1] save", string)
-    string = sub(r"%s flat check" % DC, r"@Check[type:flat|dc:\1]", string)
+    string = sub(r"(\w+) Lore %s" % DC, r"@Check[\2-lore|dc:\1]{\1 Lore}", string)
+    string = sub(r"%s (\w+) save" % DC, r"@Check[\2|dc:\1] save", string)
+    string = sub(r"%s flat check" % DC, r"@Check[flat|dc:\1]", string)
     
-    string = sub(r"basic %s save against your class DC or spell DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classOrSpellDC.value)|basic:true] save against your class DC or spell DC", string)
-    string = sub(r"%s save against your class DC or spell DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classOrSpellDC.value)] save against your class DC or spell DC", string)
-    string = sub(r"basic %s save against your class DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classDC.value)|basic:true] save against your class DC", string)
-    string = sub(r"%s save against your class DC" % SAVES, r"@Check[type:\1|dc:resolve(@actor.system.attributes.classDC.value)] save against your class DC", string)
+    string = sub(r"basic %s save against your class DC or spell DC" % SAVES, r"@Check[\1|against:class-spell|basic] save against your class DC or spell DC", string)
+    string = sub(r"%s save against your class DC or spell DC" % SAVES, r"@Check[\1|against:class-spell] save against your class DC or spell DC", string)
+    string = sub(r"basic %s save against your class DC" % SAVES, r"@Check[\1|against:class|basic] save against your class DC", string)
+    string = sub(r"%s save against your class DC" % SAVES, r"@Check[\1|against:class] save against your class DC", string)
     
 
     # Catch capitalized saves
@@ -244,7 +244,7 @@ def handle_inlines_checks(string):
     string = sub(r"type:%s" % SKILLS, convert_to_lower, string)
     
     # Lores - capture 1-2 words between 'DC ##' and 'Lore'    
-    string = sub(r"%s ((?:\w+\s+){1,2})Lore" % DC, r"@Check[type:\2Lore|dc:\1]", string)
+    string = sub(r"%s ((?:\w+\s+){1,2})Lore" % DC, r"@Check[\2Lore|dc:\1]", string)
     
     return string
 
@@ -376,10 +376,10 @@ def preProcessSpellHeader(string):
 
 def eldamonMode(string):
     # Skills and saves
-    string = sub(r"basic (\w+) save", r"@Check[type:\1|dc:resolve(@actor.system.proficiencies.classDCs.eldamon.dc)|basic:true] save", string, count = 1)
-    string = sub(r"(\w+) save", r"@Check[type:\1|dc:resolve(@actor.system.proficiencies.classDCs.eldamon.dc)] save", string, count = 1)
+    string = sub(r"basic (\w+) save", r"@Check[\1|against:eldamon|basic] save", string, count = 1)
+    string = sub(r"(\w+) save", r"@Check[\1|against:eldamon] save", string, count = 1)
     string = sub(r"@Damage\[1d(\d+)\[(\w+)\]\] damage plus \@Damage\[1d(\d+)\[(\w+)\]\] damage for (each|every) level you have", r"@Damage[(1+@actor.level)d\1[\2]]", string)
-    string = sub(r"(melee|ranged) power attack roll", r"@Check[type:eldamon|defense:ac]{\1 power attack roll}", string, count = 1)
+    string = sub(r"(melee|ranged) power attack roll", r"@Check[eldamon|defense:ac]{\1 power attack roll}", string, count = 1)
     string = string.replace(r"roll}s", r"rolls}")
     
     return string
@@ -543,7 +543,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.26")
+root.title("PF2e on Foundry VTT Data Entry v 2.27")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
