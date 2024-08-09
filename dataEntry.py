@@ -240,8 +240,8 @@ def handle_inlines_checks(string):
     
 
     # Catch capitalized saves
-    string = sub(r"type:%s" % SAVES, convert_to_lower, string)
-    string = sub(r"type:%s" % SKILLS, convert_to_lower, string)
+    string = sub(r"\[%s" % SAVES, convert_to_lower, string)
+    string = sub(r"\[%s" % SKILLS, convert_to_lower, string)
     
     # Lores - capture 1-2 words between 'DC ##' and 'Lore'    
     string = sub(r"%s ((?:\w+\s+){1,2})Lore" % DC, r"@Check[\2Lore|dc:\1]", string)
