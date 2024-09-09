@@ -384,7 +384,7 @@ def eldamonMode(string):
     
     return string
 
-def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, starfinder_mode = True, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False, eldamon_mode = False):
+def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, starfinder_mode = False, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False, eldamon_mode = False):
     # Initial handling not using regex.
     string = "<p>" + text
     string = preProcessSpellHeader(string)
@@ -423,6 +423,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub(r"Stage (\d)", r"</p><p><strong>Stage \1</strong>", string)
 
     string = sub("Access", "<p><strong>Access</strong>", string, count=1)
+    string = sub(r"Usage", r"<strong>Usage</strong>", string)
     string = sub(r"Activate \?", r"</p><p><strong>Activate</strong> <span class='pf2-icon'>1</span>", string)
     string = sub(r"Activate (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate</strong> \1 \2", string)
     string = sub(r"Activate—(.*?) \?", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>1</span>", string)
@@ -433,10 +434,13 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub(r"Activate—(.*?) \[free-action\]", r"</p><p><strong>Activate—\1</strong> <span class='pf2-icon'>f</span>", string)
     string = sub(r"Activate—(.*?) (\d+) (minute|minutes|hour|hours)", r"</p><p><strong>Activate—\1</strong> \2 \3", string)
     string = string.replace(r"<p><strong></p>",r"")
+    string = sub(r"Transcendence—(.*?) \((.*?)\) \?", r"</p><p><strong>Transcendence—\1</strong> <span class='pf2-icon'>1</span> (\2)", string)
+    string = sub(r"Transcendence—(.*?) \?", r"</p><p><strong>Transcendence—\1</strong> <span class='pf2-icon'>1</span>", string)
+    string = sub(r"Immanence", r"</p><p><strong>Immanence</strong>", string)
     
-    string = sub(r"can't use (.*?) again for (\d)d(\d) rounds", r"can't use \1 again for [[/br \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
-    string = sub(r"can't (.*?) again for (\d)d(\d) rounds", r"can't \1 again for [[/br \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
-    string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/br \1d\2 #\3]]{\1d\2 \3}", string)
+    string = sub(r"can't use (.*?) again for (\d)d(\d) rounds", r"can't use \1 again for [[/gmr \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
+    string = sub(r"can't (.*?) again for (\d)d(\d) rounds", r"can't \1 again for [[/gmr \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
+    string = sub(r" (\d)d(\d) (rounds|minutes|hours|days)", r" [[/gmr \1d\2 #\3]]{\1d\2 \3}", string)
     string = string.replace(r"or dispel magic (", r"or @UUID[Compendium.pf2e.spells-srd.Item.9HpwDN4MYQJnW0LG] (")
 
     if third_party:
@@ -543,7 +547,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.27")
+root.title("PF2e on Foundry VTT Data Entry v 2.28")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
@@ -571,7 +575,7 @@ inline_rolls = BooleanVar(value = True)
 add_conditions = BooleanVar(value = True)
 add_actions = BooleanVar(value = True)
 add_inline_checks = BooleanVar(value = True)
-starfinder_mode = BooleanVar(value = True)
+starfinder_mode = BooleanVar(value = False)
 add_inline_templates = BooleanVar(value = True)
 remove_non_ASCII = BooleanVar(value = True)
 eldamon_mode = BooleanVar(value = False)
