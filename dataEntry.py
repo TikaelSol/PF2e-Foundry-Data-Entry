@@ -14,16 +14,9 @@ SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|
 
 CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
 
-ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl",
-           "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint",
-           "Force Open", "Grab an Edge", "Grapple", "High Jump", "Leap", "Liberating Step", "Long Jump",
-           "Make an Impression", "Mount", "Perform", "Reposition", "Search", "Seek", "Sense Motive", "Shove", "Sneak",
-           "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds",
-           "Trip", "Tumble Through"]
+ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl", "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint", "Force Open", "Grab an Edge", "Grapple", "High Jump", "Leap", "Liberating Step", "Long Jump", "Make an Impression", "Mount", "Perform", "Recall Knowledge", "Reposition", "Search", "Seek", "Sense Motive", "Shove", "Sneak", "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds", "Trip", "Tumble Through"]
 
-CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Invisible",
-              "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed",
-              "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed", "Off-Guard"]
+CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Invisible", "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed", "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed", "Off-Guard"]
 
 SF_CONDITIONS = ["Suppressed", "Untethered"]
 
@@ -137,8 +130,12 @@ def handle_damage_rolls(string):
     string = sub(r"(\d+)d(\d+) persistent %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[persistent,\3]] damage", string)
     string = sub(r"(\d+)d(\d+) %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[\3]] damage", string)
     string = sub(r"(\d+)d(\d+) damage", r"@Damage[\1d\2[untyped]] damage", string)
+    string = sub(r" (\d+) damage", r"@Damage[\1[untyped]] damage", string)
+    
+    if "@Template" in string:
+        string = sub(r"@Damage\[(.*?)\]\]", r"@Damage[\1]|options:area-damage]", string)
+    
     string = sub(r"(\d+)d(\d+) (\,|\.)", r"[[/r \1d\2 #\3]]{\1d\2 \3}\4", string)
-    string = sub(r"(\d+)d(\d+)\.", r"[[/r \1d\2]].", string)
     
     string = string.replace(r"[negative]", r"[void]")
     string = string.replace(r"[positive]", r"[vitality]")
@@ -170,6 +167,7 @@ def handle_bullet_lists(string):
 def handle_templates(string):
     # Add template buttons
     string = sub(r"(\d+)-(foot|Foot) (emanation|burst|cone|line|Emanation|Burst|Cone|Line)", r"@Template[type:\3|distance:\1]", string)
+    string = sub(r"(\d+)-(foot|Foot)-(emanation|burst|cone|line|Emanation|Burst|Cone|Line)", r"@Template[type:\3|distance:\1]", string)
     string = sub(r"type:%s" % r"(Emanation|Burst|Cone|Line)", convert_to_lower, string)
     
     return string
@@ -177,13 +175,16 @@ def handle_templates(string):
 
 def handle_third_party(string):
     # Handling for 3rd party formatting.
-    string = sub(r"» (Critical Success|Success|Failure|Critical Failure)", r"</p><p><strong>\1</strong>", string)
-    string = sub(r"»", r"•", string)
+    string = sub(r"Accuracy \(", r"<strong>Accuracy</strong> (", string)
+    string = sub(r"Damage \(", r"<strong>Damage</strong> (", string)
+    string = sub(r"Defence \(", r"<strong>Defence</strong> (", string)
+    string = sub(r"Hit Points \(", r"<strong>Hit Points</strong> (", string)
+    string = sub(r"Utility \(", r"<strong>Utility</strong> (", string)
     return string
 
 
 def handle_background(string):
-    string = sub(r"Choose two ability boosts.", r"</p><p>Choose two ability boosts.", string)
+    string = sub(r"Choose two ability boosts.", r"</p><p>Choose two attribute boosts.", string)
     string = sub(r"Choose two attribute boosts.", r"</p><p>Choose two attribute boosts.", string)
     string = sub(r"%s" % ABILITY_SCORES, r"<strong>\1</strong>", string, count=2)
     string = sub(r"You're trained in", r"</p><p>You're trained in", string)
@@ -251,6 +252,9 @@ def handle_inlines_checks(string):
 
 def handle_counteract(string):
     string = sub(r"counteract modifier of \+(\d+)", r"counteract modifier of [[/r 1d20+\1 #Counteract]]{+\1}", string)
+    string = sub(r"counteract modifier \+(\d+)", r"counteract modifier [[/r 1d20+\1 #Counteract]]{+\1}", string)
+    string = sub(r"Counteract modifier of \+(\d+)", r"Counteract modifier of [[/r 1d20+\1 #Counteract]]{+\1}", string)
+    string = sub(r"Counteract modifier \+(\d+)", r"Counteract modifier [[/r 1d20+\1 #Counteract]]{+\1}", string)
     string = sub(r"\+(\d+) counteract modifier", r"[[/r 1d20+\1 #Counteract]]{+\1} counteract modifier", string)
     return string
 
@@ -273,6 +277,24 @@ def handle_areas(string):
 
 def handle_innate_spell_links(string):
     string = sub(r"You can cast (\w+) (.*?) innate", r"You can cast <em>@Compendium[pf2e.spells-srd.\1]{\1}</em> \2 innate", string)
+    return string
+
+def handle_deities(string):
+    string = sub(r"Areas of Concern", r"<strong>Areas of Concern</strong>", string)
+    string = sub(r"Edicts", r"</p><p><strong>Edicts</strong>", string)
+    string = sub(r"Anathema", r"</p><p><strong>Anathema</strong>", string)
+    string = sub(r"Religious Symbol", r"</p><p><strong>Religious Symbol</strong>", string)
+    string = sub(r"Sacred Animal", r"</p><p><strong>Sacred Animal</strong>", string)
+    string = sub(r"Sacred Colors", r"</p><p><strong>Sacred Colors</strong>", string)
+    string = sub(r"Divine Attribute", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Devotee Benefits", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Cleric Spells", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Divine Font", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Divine Sanctification", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Divine Skill", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Domains", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Alternate Domains", r"</p><p><strong>REMOVE ME</strong>", string)
+    string = sub(r"Favored Weapon", r"</p><p><strong>REMOVE ME</strong>", string)
     return string
 
 
@@ -384,7 +406,7 @@ def eldamonMode(string):
     
     return string
 
-def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, starfinder_mode = False, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False, eldamon_mode = False):
+def reformat(text, third_party = False, companion = False, eidolon = False, ancestry = False, use_clipboard=True, add_gm_text = True, inline_rolls = True, starfinder_mode = False, add_conditions = True, add_actions = True, add_inline_checks = True, add_inline_templates = True, remove_non_ASCII = True, replacement_mode = False, monster_parts = False, eldamon_mode = False, deity = False):
     # Initial handling not using regex.
     string = "<p>" + text
     string = preProcessSpellHeader(string)
@@ -405,6 +427,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
         .replace("Maximum Duration", "</p><p><strong>Maximum Duration</strong>")\
         .replace("Onset", "</p><p><strong>Onset</strong>")\
         .replace("Saving Throw", "</p><p><strong>Saving Throw</strong>")\
+        .replace("Demoralise", "Demoralize")\
         .replace("f at-footed", "flat-footed").replace("Ef ect", "Effect") # Fix common Paizo pre-release PDF formatting errors
         
     if starfinder_mode:
@@ -437,6 +460,7 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub(r"Transcendence—(.*?) \((.*?)\) \?", r"</p><p><strong>Transcendence—\1</strong> <span class='pf2-icon'>1</span> (\2)", string)
     string = sub(r"Transcendence—(.*?) \?", r"</p><p><strong>Transcendence—\1</strong> <span class='pf2-icon'>1</span>", string)
     string = sub(r"Immanence", r"</p><p><strong>Immanence</strong>", string)
+    string = sub(r"\[(1|2|3|r|f)\]", r"<span class='pf2-icon'>\1</span>", string)
     
     string = sub(r"can't use (.*?) again for (\d)d(\d) rounds", r"can't use \1 again for [[/gmr \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
     string = sub(r"can't (.*?) again for (\d)d(\d) rounds", r"can't \1 again for [[/gmr \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
@@ -461,11 +485,11 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     if add_conditions:
         string = handle_conditions(string, condition_list, numbered_condition_list)
 
-    if inline_rolls:
-        string = handle_damage_rolls(string)
-    
     if add_inline_templates:
         string = handle_templates(string)
+
+    if inline_rolls:
+        string = handle_damage_rolls(string)
     
     string = handle_spell_heightening(string)
     string = handle_level_heightening(string)
@@ -489,16 +513,19 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     
     string = handle_areas(string)
     
-    string = remove_books(string)    
+    string = remove_books(string)
+    
+    if deity:
+        string = handle_deities(string)
 
     if "Choose two ability boosts" in string or "Choose two attribute boosts" in string:
         string = handle_background(string)
-        
-    string = string.replace("<p></p>","").replace("<p><p>","<p>")
+    
     string = string.replace(" <p>","</p><p>")
     string = string.replace(" </p>", "</p>")
     string = string.replace(";</p>","</p>")
     string = string.replace("<p> ","<p>")
+    string = string.replace("<p></p>","").replace("<p><p>","<p>")
     
     # Catch non-link references to flat footed.
     string = string.replace("flat footed", "off-guard").replace("flat-footed", "off-guard")
@@ -547,7 +574,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.28")
+root.title("PF2e on Foundry VTT Data Entry v 2.30")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
@@ -579,6 +606,7 @@ starfinder_mode = BooleanVar(value = False)
 add_inline_templates = BooleanVar(value = True)
 remove_non_ASCII = BooleanVar(value = True)
 eldamon_mode = BooleanVar(value = False)
+deity = BooleanVar(value = False)
 ###############################################################################
 
 
@@ -595,6 +623,7 @@ settings_menu.add_checkbutton(label = "Handle Starfinder 2e formatting", variabl
 settings_menu.add_checkbutton(label = "Add Inline Templates", variable = add_inline_templates)
 settings_menu.add_checkbutton(label = "Add Inline Checks", variable = add_inline_checks)
 settings_menu.add_checkbutton(label = "Add Condition Links", variable = add_conditions)
+settings_menu.add_checkbutton(label = "Handle Deity Formatting", variable = deity)
 settings_menu.add_checkbutton(label = "Add Action Links", variable = add_actions)
 settings_menu.add_checkbutton(label = "Remove non-ASCII characters", variable = remove_non_ASCII)
 settings_menu.add_checkbutton(label = "No Wrapping <p> tags", variable = replacement_mode)
@@ -610,7 +639,7 @@ root.config(menu = menu)
 
 ##############################################################################
 
-reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), starfinder_mode.get(), add_conditions.get(), add_actions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get(), replacement_mode.get(), monster_parts.get(), eldamon_mode.get()))
+reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), starfinder_mode.get(), add_conditions.get(), add_actions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get(), replacement_mode.get(), monster_parts.get(), eldamon_mode.get(), deity.get()))
 reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
 
 resetButton = Button(root, text="Clear Input", command = lambda: clearInput())
