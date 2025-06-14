@@ -1,7 +1,9 @@
 import regex as re
 from regex import sub
 from pyperclip import copy
-from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu
+from tkinter import Tk, Frame, Canvas, Text, Button, END, BooleanVar, Menu, INSERT
+from clipboard_windows import is_windows, paste_windows
+from rtf import preformat_rtf
 
 ## As nice as it is to have these declared separately for some reason different IDEs react poorly to them being * imported.
 DC = r"DC (\d+)"
@@ -585,6 +587,32 @@ frame.place(relwidth = 1, relheight = 1)
 inputText = Text(frame, bg = 'white')
 inputText.place(rely = 0.2, relwidth = 0.49, relheight = 0.8)
 
+def handle_paste(event):
+    """
+    Customized paste handler
+    Does default paste if not on windows or RTF paste is disabled
+    Tries to get the data in RTF format
+    If data is in RTF format, processes RTF tags
+    """
+    if not is_windows() or not paste_rtf.get():
+        return
+    data = paste_windows()
+    if data[0] != "Rich Text Format":
+        return
+
+    text = preformat_rtf(data[1])
+    try:
+        # will try to replace selected text first
+        start = event.widget.index("sel.first")
+        end = event.widget.index("sel.last")
+        event.widget.delete(start, end)
+        event.widget.insert(INSERT, text)
+    except:
+        event.widget.insert(INSERT, text)
+    return "break"
+
+inputText.bind("<<Paste>>", handle_paste)
+
 outputText = Text(frame, bg = 'white')
 outputText.place(relx = 0.51, rely = 0.2, relwidth = 0.49, relheight = 0.8)
 
@@ -607,6 +635,7 @@ add_inline_templates = BooleanVar(value = True)
 remove_non_ASCII = BooleanVar(value = True)
 eldamon_mode = BooleanVar(value = False)
 deity = BooleanVar(value = False)
+paste_rtf = BooleanVar(value = False)
 ###############################################################################
 
 
@@ -617,6 +646,7 @@ menu = Menu(root)
 
 settings_menu = Menu(menu)
 settings_menu.add_checkbutton(label = "Copy Output to Clipboard", variable = use_clipboard)
+settings_menu.add_checkbutton(label = "Try paste RTF data", variable = paste_rtf)
 settings_menu.add_checkbutton(label = "Add GM Only Tags", variable = add_gm_text)
 settings_menu.add_checkbutton(label = "Handle Inline rolls", variable = inline_rolls)
 settings_menu.add_checkbutton(label = "Handle Starfinder 2e formatting", variable = starfinder_mode)
@@ -642,7 +672,7 @@ root.config(menu = menu)
 reformatButton = Button(root, text="Reformat Text", command = lambda: reformat(inputText.get("1.0", "end-1c"), third_party.get(), companion.get(), eidolon.get(), ancestry.get(), use_clipboard.get(), add_gm_text.get(), inline_rolls.get(), starfinder_mode.get(), add_conditions.get(), add_actions.get(), add_inline_checks.get(), add_inline_templates.get(), remove_non_ASCII.get(), replacement_mode.get(), monster_parts.get(), eldamon_mode.get(), deity.get()))
 reformatButton.place(relx = 0.75, rely= 0, relwidth = 0.25, relheight = 0.2)
 
-resetButton = Button(root, text="Clear Input", command = lambda: clearInput())
+resetButton = Button(root, text="Clear Input", command = clearInput)
 resetButton.place(relx = 0, rely= 0, relwidth = 0.25, relheight = 0.2)
 
 def main():
