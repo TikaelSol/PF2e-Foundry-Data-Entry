@@ -81,17 +81,3 @@ def paste_windows() -> Tuple[str, Optional[str]]:
     GlobalUnlock(handle)
     CloseClipboard()
     return fmt[1], text
-
-
-def put(s):
-    if not isinstance(s, unicode_type):
-        s = s.decode('mbcs')
-    data = s.encode('utf-16le')
-    OpenClipboard(None)
-    EmptyClipboard()
-    handle = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len(data) + 2)
-    pcontents = GlobalLock(handle)
-    ctypes.memmove(pcontents, data, len(data))
-    GlobalUnlock(handle)
-    SetClipboardData(CF_UNICODETEXT, handle)
-    CloseClipboard()
