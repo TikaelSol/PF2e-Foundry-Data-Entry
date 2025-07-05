@@ -368,6 +368,7 @@ def fix_links(string):
         .replace("@Compendium[pf2e.actionspf2e.Make an Impression]", "@UUID[Compendium.pf2e.actionspf2e.Item.OX4fy22hQgUHDr0q]")\
         .replace("@Compendium[pf2e.actionspf2e.Mount]", "@UUID[Compendium.pf2e.actionspf2e.Item.PM5jvValFkbFH3TV]")\
         .replace("@Compendium[pf2e.actionspf2e.Perform]", "@UUID[Compendium.pf2e.actionspf2e.Item.EEDElIyin4z60PXx]")\
+        .replace("@Compendium[pf2e.actionspf2e.Recall Knowledge]", "@UUID[Compendium.pf2e.actionspf2e.Item.1OagaWtBpVXExToo]")\
         .replace("@Compendium[pf2e.actionspf2e.Reposition]", "@UUID[Compendium.pf2e.actionspf2e.Item.lOE4yjUnETTdaf2T]")\
         .replace("@Compendium[pf2e.actionspf2e.Search]", "@UUID[Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU]")\
         .replace("@Compendium[pf2e.actionspf2e.Seek]", "@UUID[Compendium.pf2e.actionspf2e.Item.BlAOM2X92SI6HMtJ]")\
@@ -460,6 +461,10 @@ def reformat(text, third_party = False, companion = False, eidolon = False, ance
     string = sub(r"Transcendence—(.*?) \((.*?)\) \?", r"</p><p><strong>Transcendence—\1</strong> <span class='pf2-icon'>1</span> (\2)", string)
     string = sub(r"Transcendence—(.*?) \?", r"</p><p><strong>Transcendence—\1</strong> <span class='pf2-icon'>1</span>", string)
     string = sub(r"Immanence", r"</p><p><strong>Immanence</strong>", string)
+    string = sub(r"Lead by Example", "</p><p><strong>Lead by Example</strong>", string)
+    string = sub(r"Graviton-Attuned", "</p><p><strong>Graviton-Attuned</strong>", string)
+    string = sub(r"Photon-Attuned", "</p><p><strong>Photon-Attuned</strong>", string)
+    string = sub(r"Awakening", r"</p><p><strong>Awakening</strong>", string)
     string = sub(r"\[(1|2|3|r|f)\]", r"<span class='pf2-icon'>\1</span>", string)
     
     string = sub(r"can't use (.*?) again for (\d)d(\d) rounds", r"can't use \1 again for [[/gmr \2d\3 #Recharge \1]]{\2d\3 rounds}", string)
@@ -574,7 +579,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.30")
+root.title("PF2e on Foundry VTT Data Entry v 2.31")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
