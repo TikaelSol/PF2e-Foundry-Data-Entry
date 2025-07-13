@@ -345,9 +345,9 @@ def fix_links(string):
         .replace("@Compendium[pf2e.conditionitems.Stunned]", "@UUID[Compendium.pf2e.conditionitems.Item.dfCMdR4wnpbYNTix]")\
         .replace("@Compendium[pf2e.conditionitems.Stupefied]", "@UUID[Compendium.pf2e.conditionitems.Item.e1XGnhKNSQIm5IXg]")\
         .replace("@Compendium[pf2e.conditionitems.Wounded]", "@UUID[Compendium.pf2e.conditionitems.Item.Yl48xTdMh3aeQYL2]")\
-        .replace("@Compendium[pf2e.conditionitems.Glitching]", "@UUID[Compendium.starfinder-field-test-for-pf2e.conditions.Item.6A2QDy8wRGCVQsSd]")\
-        .replace("@Compendium[pf2e.conditionitems.Suppressed]", "@UUID[Compendium.starfinder-field-test-for-pf2e.conditions.Item.enA7BxAjBb7ns1iF]")\
-        .replace("@Compendium[pf2e.conditionitems.Untethered]", "@UUID[Compendium.starfinder-field-test-for-pf2e.conditions.Item.z1ucw4CLwLqHoAp3]")\
+        .replace("@Compendium[pf2e.conditionitems.Glitching]", "@UUID[Compendium.sf2e-anachronism.conditions.Item.6A2QDy8wRGCVQsSd]")\
+        .replace("@Compendium[pf2e.conditionitems.Suppressed]", "@UUID[Compendium.sf2e-anachronism.conditions.Item.enA7BxAjBb7ns1iF]")\
+        .replace("@Compendium[pf2e.conditionitems.Untethered]", "@UUID[Compendium.sf2e-anachronism.conditions.Item.z1ucw4CLwLqHoAp3]")\
         .replace("@Compendium[pf2e.actionspf2e.Avoid Notice]", "@UUID[Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn]")\
         .replace("@Compendium[pf2e.actionspf2e.Balance]", "@UUID[Compendium.pf2e.actionspf2e.Item.M76ycLAqHoAgbcej]")\
         .replace("@Compendium[pf2e.actionspf2e.Coerce]", "@UUID[Compendium.pf2e.actionspf2e.Item.tHCqgwjtQtzNqVvd]")\
@@ -579,7 +579,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.31")
+root.title("PF2e on Foundry VTT Data Entry v 2.32")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
