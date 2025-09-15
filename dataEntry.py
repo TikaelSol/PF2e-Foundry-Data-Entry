@@ -14,9 +14,9 @@ SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|
 
 CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
 
-ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl", "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Escape", "Feint", "Force Open", "Grab an Edge", "Grapple", "High Jump", "Leap", "Liberating Step", "Long Jump", "Make an Impression", "Mount", "Perform", "Recall Knowledge", "Reposition", "Search", "Seek", "Sense Motive", "Shove", "Sneak", "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds", "Trip", "Tumble Through"]
+ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl", "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Feint", "Force Open", "Grab an Edge", "Grapple", "Hide", "High Jump", "Leap", "Liberating Step", "Long Jump", "Make an Impression", "Mount", "Perform", "Recall Knowledge", "Reposition", "Search", "Seek", "Sense Motive", "Shove", "Sneak", "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds", "Trip", "Tumble Through"]
 
-CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Invisible", "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed", "Hidden", "Quickened", "Fleeing", "Restrained", "Grabbed", "Off-Guard"]
+CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed", "Quickened", "Fleeing", "Restrained", "Grabbed", "Off-Guard"]
 
 SF_CONDITIONS = ["Suppressed", "Untethered"]
 
@@ -50,7 +50,7 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
-    return sub(r"\b" + action + r"\b", r"@Compendium[pf2e.actionspf2e.%s]{%s}" % (action, action), string, count = 1)
+    return sub(r"\b" + action + r"\b", r"[[/act %s]]" % (action.lower().replace(" ", "-")), string, count = 1)
 
 
 def condition_sub(string, condition):
@@ -130,7 +130,11 @@ def handle_damage_rolls(string):
     string = sub(r"(\d+)d(\d+) persistent %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[persistent,\3]] damage", string)
     string = sub(r"(\d+)d(\d+) %s damage" % DAMAGE_TYPES, r"@Damage[\1d\2[\3]] damage", string)
     string = sub(r"(\d+)d(\d+) damage", r"@Damage[\1d\2[untyped]] damage", string)
-    string = sub(r" (\d+) damage", r"@Damage[\1[untyped]] damage", string)
+    string = sub(r" (\d+) damage", r" @Damage[\1[untyped]] damage", string)
+    string = sub(r"(\d+)d(\d+) Hit Points", r"@Damage[\1d\2[healing]] Hit Points", string)
+    string = sub(r"(\d+)d(\d+)\+(\d+) Hit Points", r"@Damage[(\1d\2+\3)[healing]] Hit Points", string)
+    string = sub(r" (\d+) Hit Points", r" @Damage[\1[healing]] Hit Points", string)
+    string = string.replace("@Damage[0[healing]]", "0")
     
     if "@Template" in string:
         string = sub(r"@Damage\[(.*?)\]\]", r"@Damage[\1]|options:area-damage]", string)
@@ -219,6 +223,7 @@ def handle_inlines_checks(string):
     string = sub(r"%s basic (\w+) save" % DC, r"@Check[\2|dc:\1|basic] save", string)
     string = sub(r"basic (\w+) save %s" % DC, r"@Check[\1|dc:\2|basic] save", string)
     string = sub(r"basic (\w+) %s" % DC, r"@Check[\1|dc:\2|basic]", string)
+    string = sub(r"%s basic %s" % (DC, SAVES), r"@Check[\2|dc:\1|basic]", string)
     string = sub(r"%s %s" % (DC, SAVES), r"@Check[\2|dc:\1]", string)
     string = sub(r"%s %s" % (SAVES, DC), r"@Check[\1|dc:\2]", string)
     string = sub(r"%s \(%s\)" % (SAVES, DC), r"@Check[\1|dc:\2]", string)
@@ -239,6 +244,12 @@ def handle_inlines_checks(string):
     string = sub(r"basic %s save against your class DC" % SAVES, r"@Check[\1|against:class|basic] save against your class DC", string)
     string = sub(r"%s save against your class DC" % SAVES, r"@Check[\1|against:class] save against your class DC", string)
     
+
+    # Escape
+    string = sub(r"Escapes \(%s\)" % DC, r"[[/act escape dc=\1]]{Escapes}", string)
+    string = sub(r"Escape \(%s\)" % DC, r"[[/act escape dc=\1]]", string)
+    string = sub(r"Escape %s" % DC, r"[[/act escape dc=\1]]", string)
+    string = sub(r"Escape it \(%s\)" % DC, r"[[/act escape dc=\1]] it", string)
 
     # Catch capitalized saves
     string = sub(r"\[%s" % SAVES, convert_to_lower, string)
@@ -297,7 +308,6 @@ def handle_deities(string):
     string = sub(r"Favored Weapon", r"</p><p><strong>REMOVE ME</strong>", string)
     return string
 
-
 def remove_books(string):
     for book in BOOK_TITLES:
         string = sub(r" \((Pathfinder |)%s (\d+)\)" % book, r"", string)
@@ -322,7 +332,6 @@ def fix_links(string):
         .replace("@Compendium[pf2e.conditionitems.Concealed]", "@UUID[Compendium.pf2e.conditionitems.Item.DmAIPqOBomZ7H95W]")\
         .replace("@Compendium[pf2e.conditionitems.Dazzled]", "@UUID[Compendium.pf2e.conditionitems.Item.TkIyaNPgTZFBCCuh]")\
         .replace("@Compendium[pf2e.conditionitems.Deafened]", "@UUID[Compendium.pf2e.conditionitems.Item.9PR9y0bi4JPKnHPR]")\
-        .replace("@Compendium[pf2e.conditionitems.Invisible]", "@UUID[Compendium.pf2e.conditionitems.Item.zJxUflt9np0q4yML]")\
         .replace("@Compendium[pf2e.conditionitems.Flat-Footed]", "@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]")\
         .replace("@Compendium[pf2e.conditionitems.Off-Guard]", "@UUID[Compendium.pf2e.conditionitems.Item.AJh5ex99aV6VTggg]")\
         .replace("@Compendium[pf2e.conditionitems.Immobilized]", "@UUID[Compendium.pf2e.conditionitems.Item.eIcWbB5o3pP6OIMe]")\
@@ -330,7 +339,6 @@ def fix_links(string):
         .replace("@Compendium[pf2e.conditionitems.Unconscious]", "@UUID[Compendium.pf2e.conditionitems.Item.fBnFDH2MTzgFijKf]")\
         .replace("@Compendium[pf2e.conditionitems.Fascinated]", "@UUID[Compendium.pf2e.conditionitems.Item.AdPVz7rbaVSRxHFg]")\
         .replace("@Compendium[pf2e.conditionitems.Paralyzed]", "@UUID[Compendium.pf2e.conditionitems.Item.6uEgoh53GbXuHpTF]")\
-        .replace("@Compendium[pf2e.conditionitems.Hidden]", "@UUID[Compendium.pf2e.conditionitems.Item.iU0fEDdBp3rXpTMC]")\
         .replace("@Compendium[pf2e.conditionitems.Quickened]", "@UUID[Compendium.pf2e.conditionitems.Item.nlCjDvLMf2EkV2dl]")\
         .replace("@Compendium[pf2e.conditionitems.Fleeing]", "@UUID[Compendium.pf2e.conditionitems.Item.sDPxOjQ9kx2RZE8D]")\
         .replace("@Compendium[pf2e.conditionitems.Restrained]", "@UUID[Compendium.pf2e.conditionitems.Item.VcDeM8A5oI6VqhbM]")\
@@ -347,42 +355,7 @@ def fix_links(string):
         .replace("@Compendium[pf2e.conditionitems.Wounded]", "@UUID[Compendium.pf2e.conditionitems.Item.Yl48xTdMh3aeQYL2]")\
         .replace("@Compendium[pf2e.conditionitems.Glitching]", "@UUID[Compendium.sf2e-anachronism.conditions.Item.6A2QDy8wRGCVQsSd]")\
         .replace("@Compendium[pf2e.conditionitems.Suppressed]", "@UUID[Compendium.sf2e-anachronism.conditions.Item.enA7BxAjBb7ns1iF]")\
-        .replace("@Compendium[pf2e.conditionitems.Untethered]", "@UUID[Compendium.sf2e-anachronism.conditions.Item.z1ucw4CLwLqHoAp3]")\
-        .replace("@Compendium[pf2e.actionspf2e.Avoid Notice]", "@UUID[Compendium.pf2e.actionspf2e.Item.IE2nThCmoyhQA0Jn]")\
-        .replace("@Compendium[pf2e.actionspf2e.Balance]", "@UUID[Compendium.pf2e.actionspf2e.Item.M76ycLAqHoAgbcej]")\
-        .replace("@Compendium[pf2e.actionspf2e.Coerce]", "@UUID[Compendium.pf2e.actionspf2e.Item.tHCqgwjtQtzNqVvd]")\
-        .replace("@Compendium[pf2e.actionspf2e.Crawl]", "@UUID[Compendium.pf2e.actionspf2e.Item.Tj055UcNm6UEgtCg]")\
-        .replace("@Compendium[pf2e.actionspf2e.Create a Diversion]", "@UUID[Compendium.pf2e.actionspf2e.Item.GkmbTGfg8KcgynOA]")\
-        .replace("@Compendium[pf2e.actionspf2e.Demoralize]", "@UUID[Compendium.pf2e.actionspf2e.Item.2u915NdUyQan6uKF]")\
-        .replace("@Compendium[pf2e.actionspf2e.Disable Device]", "@UUID[Compendium.pf2e.actionspf2e.Item.cYdz2grcOcRt4jk6]")\
-        .replace("@Compendium[pf2e.actionspf2e.Disarm]", "@UUID[Compendium.pf2e.actionspf2e.Item.Dt6B1slsBy8ipJu9]")\
-        .replace("@Compendium[pf2e.actionspf2e.Earn Income]", "@UUID[Compendium.pf2e.actionspf2e.Item.QyzlsLrqM0EEwd7j]")\
-        .replace("@Compendium[pf2e.actionspf2e.Escape]", "@UUID[Compendium.pf2e.actionspf2e.Item.SkZAQRkLLkmBQNB9]")\
-        .replace("@Compendium[pf2e.actionspf2e.Feint]", "@UUID[Compendium.pf2e.actionspf2e.Item.QNAVeNKtHA0EUw4X]")\
-        .replace("@Compendium[pf2e.actionspf2e.Force Open]", "@UUID[Compendium.pf2e.actionspf2e.Item.SjmKHgI7a5Z9JzBx]")\
-        .replace("@Compendium[pf2e.actionspf2e.Grab an Edge]", "@UUID[Compendium.pf2e.actionspf2e.Item.3yoajuKjwHZ9ApUY]")\
-        .replace("@Compendium[pf2e.actionspf2e.Grapple]", "@UUID[Compendium.pf2e.actionspf2e.Item.PMbdMWc2QroouFGD]")\
-        .replace("@Compendium[pf2e.actionspf2e.High Jump]", "@UUID[Compendium.pf2e.actionspf2e.Item.2HJ4yuEFY1Cast4h]")\
-        .replace("@Compendium[pf2e.actionspf2e.Leap]", "@UUID[Compendium.pf2e.actionspf2e.Item.d5I6018Mci2SWokk]")\
-        .replace("@Compendium[pf2e.actionspf2e.Long Jump]", "@UUID[Compendium.pf2e.actionspf2e.Item.JUvAvruz7yRQXfz2]")\
-        .replace("@Compendium[pf2e.actionspf2e.Make an Impression]", "@UUID[Compendium.pf2e.actionspf2e.Item.OX4fy22hQgUHDr0q]")\
-        .replace("@Compendium[pf2e.actionspf2e.Mount]", "@UUID[Compendium.pf2e.actionspf2e.Item.PM5jvValFkbFH3TV]")\
-        .replace("@Compendium[pf2e.actionspf2e.Perform]", "@UUID[Compendium.pf2e.actionspf2e.Item.EEDElIyin4z60PXx]")\
-        .replace("@Compendium[pf2e.actionspf2e.Recall Knowledge]", "@UUID[Compendium.pf2e.actionspf2e.Item.1OagaWtBpVXExToo]")\
-        .replace("@Compendium[pf2e.actionspf2e.Reposition]", "@UUID[Compendium.pf2e.actionspf2e.Item.lOE4yjUnETTdaf2T]")\
-        .replace("@Compendium[pf2e.actionspf2e.Search]", "@UUID[Compendium.pf2e.actionspf2e.Item.TiNDYUGlMmxzxBYU]")\
-        .replace("@Compendium[pf2e.actionspf2e.Seek]", "@UUID[Compendium.pf2e.actionspf2e.Item.BlAOM2X92SI6HMtJ]")\
-        .replace("@Compendium[pf2e.actionspf2e.Sense Motive]", "@UUID[Compendium.pf2e.actionspf2e.Item.1xRFPTFtWtGJ9ELw]")\
-        .replace("@Compendium[pf2e.actionspf2e.Shove]", "@UUID[Compendium.pf2e.actionspf2e.Item.7blmbDrQFNfdT731]")\
-        .replace("@Compendium[pf2e.actionspf2e.Sneak]", "@UUID[Compendium.pf2e.actionspf2e.Item.VMozDqMMuK5kpoX4]")\
-        .replace("@Compendium[pf2e.actionspf2e.Steal]", "@UUID[Compendium.pf2e.actionspf2e.Item.RDXXE7wMrSPCLv5k]")\
-        .replace("@Compendium[pf2e.actionspf2e.Take Cover]", "@UUID[Compendium.pf2e.actionspf2e.Item.ust1jJSCZQUhBZIz]")\
-        .replace("@Compendium[pf2e.actionspf2e.Track]", "@UUID[Compendium.pf2e.actionspf2e.Item.EA5vuSgJfiHH7plD]")\
-        .replace("@Compendium[pf2e.actionspf2e.Treat Disease]", "@UUID[Compendium.pf2e.actionspf2e.Item.TC7OcDa7JlWbqMaN]")\
-        .replace("@Compendium[pf2e.actionspf2e.Treat Poison]", "@UUID[Compendium.pf2e.actionspf2e.Item.KjoCEEmPGTeFE4hh]")\
-        .replace("@Compendium[pf2e.actionspf2e.Treat Wounds]", "@UUID[Compendium.pf2e.actionspf2e.Item.1kGNdIIhuglAjIp9]")\
-        .replace("@Compendium[pf2e.actionspf2e.Trip]", "@UUID[Compendium.pf2e.actionspf2e.Item.ge56Lu1xXVFYUnLP]")\
-        .replace("@Compendium[pf2e.actionspf2e.Tumble Through]", "@UUID[Compendium.pf2e.actionspf2e.Item.21WIfSu7Xd7uKqV8]")
+        .replace("@Compendium[pf2e.conditionitems.Untethered]", "@UUID[Compendium.sf2e-anachronism.conditions.Item.z1ucw4CLwLqHoAp3]")
         
     return string
 
@@ -579,7 +552,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.32")
+root.title("PF2e on Foundry VTT Data Entry v 2.33")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
