@@ -14,7 +14,14 @@ SKILLS = r"(Perception|Acrobatics|Arcana|Athletics|Crafting|Deception|Diplomacy|
 
 CONDITION_COMPENDIUM = r"@Compendium[pf2e.conditionitems."
 
-ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl", "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Earn Income", "Feint", "Force Open", "Grab an Edge", "Grapple", "Hide", "High Jump", "Leap", "Liberating Step", "Long Jump", "Make an Impression", "Mount", "Perform", "Recall Knowledge", "Reposition", "Search", "Seek", "Sense Motive", "Shove", "Sneak", "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Treat Wounds", "Trip", "Tumble Through"]
+INLINE_ACTIONS = ["Avoid Notice", "Balance", "Coerce", "Crawl", "Create a Diversion", "Demoralize", "Disable Device", "Disarm", "Feint", "Force Open", "Grab an Edge", "Grapple", "Hide", "High Jump", "Leap", "Long Jump", "Make an Impression", "Perform", "Reposition", "Search", "Seek", "Sense Motive", "Shove", "Sneak", "Steal", "Take Cover", "Track", "Treat Disease", "Treat Poison", "Trip", "Tumble Through"]
+
+LINKED_ACTIONS = [
+    {"name": "Administer First Aid", "id": "HLuKy4nQO2Z4Am1"},
+    {"name": "Earn Income", "id": "QyzlsLrqM0EEwd7j"},
+    {"name": "Recall Knowledge", "id": "1OagaWtBpVXExToo"},
+    {"name": "Treat Wounds", "id": "1kGNdIIhuglAjIp9"}
+]
 
 CONDITIONS = ["Blinded", "Fatigued", "Confused", "Concealed", "Dazzled", "Deafened", "Flat-Footed", "Immobilized", "Prone", "Unconscious", "Fascinated", "Paralyzed", "Quickened", "Fleeing", "Restrained", "Grabbed", "Off-Guard"]
 
@@ -50,6 +57,9 @@ def convert_to_lower(match_obj):
 
 
 def action_sub(string, action):
+    return sub(r"\b" + action["name"] + r"\b", r"@UUID[Compendium.pf2e.actionspf2e.Item.%s]" % action["id"], string, count = 1)
+
+def inline_action_sub(string, action):
     return sub(r"\b" + action + r"\b", r"[[/act %s]]" % (action.lower().replace(" ", "-")), string, count = 1)
 
 
@@ -76,8 +86,12 @@ def spell_sub(string, spell):
 
 
 def handle_actions(string):
-    for action in ACTIONS:
+    for action in INLINE_ACTIONS:
+        string = inline_action_sub(string, action)
+
+    for action in LINKED_ACTIONS:
         string = action_sub(string, action)
+        
     return string
 
 
@@ -552,7 +566,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.33")
+root.title("PF2e on Foundry VTT Data Entry v 2.34")
 
 canvas = Canvas(root, height = Height, width = Width)
 canvas.pack()
