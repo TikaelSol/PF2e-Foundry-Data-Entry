@@ -760,13 +760,13 @@ def fix_links(string):
         "@UUID[Compendium.pf2e.conditionitems.Item.Yl48xTdMh3aeQYL2]"
     ).replace(
         "@Compendium[pf2e.conditionitems.Glitching]",
-        "@UUID[Compendium.sf2e-anachronism.conditions.Item.6A2QDy8wRGCVQsSd]"
+        "@UUID[Compendium.sf2e.conditions.Item.6A2QDy8wRGCVQsSd]"
     ).replace(
         "@Compendium[pf2e.conditionitems.Suppressed]",
-        "@UUID[Compendium.sf2e-anachronism.conditions.Item.enA7BxAjBb7ns1iF]"
+        "@UUID[Compendium.sf2e.conditions.Item.enA7BxAjBb7ns1iF]"
     ).replace(
         "@Compendium[pf2e.conditionitems.Untethered]",
-        "@UUID[Compendium.sf2e-anachronism.conditions.Item.z1ucw4CLwLqHoAp3]"
+        "@UUID[Compendium.sf2e.conditions.Item.z1ucw4CLwLqHoAp3]"
     )
 
     return string
@@ -1147,6 +1147,9 @@ def reformat(
         string = string[3:]
         string = string[:-4]
 
+    if starfinder_mode:
+        string = string.replace("pf2e.conditionitems", "sf2e.conditions").replace("pf2e.actionspf2e","sf2e.actions")
+
     # print("\n")
     # print(string)
 
@@ -1176,7 +1179,7 @@ Width = 800
 
 root = Tk()
 
-root.title("PF2e on Foundry VTT Data Entry v 2.34")
+root.title("PF2e on Foundry VTT Data Entry v 2.35")
 
 canvas = Canvas(root, height=Height, width=Width)
 canvas.pack()
